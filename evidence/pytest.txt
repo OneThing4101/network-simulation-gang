@@ -1,0 +1,8 @@
+.......................                                                  [100%]
+============================= slowest 5 durations ==============================
+4.32s setup    University-coursework/3A_semester/Сүлжээний загварчлал, симуляци/BiyDaalt/tests/test_network.py::test_all_routes_continuous_obstacle_and_endpoint_checks
+4.06s call     University-coursework/3A_semester/Сүлжээний загварчлал, симуляци/BiyDaalt/tests/test_network.py::test_grid_has_no_corner_cutting
+0.86s call     University-coursework/3A_semester/Сүлжээний загварчлал, симуляци/BiyDaalt/tests/test_network.py::test_all_routes_continuous_obstacle_and_endpoint_checks
+0.65s call     University-coursework/3A_semester/Сүлжээний загварчлал, симуляци/BiyDaalt/tests/test_network.py::test_node_crud_and_atomic_failure
+0.57s call     University-coursework/3A_semester/Сүлжээний загварчлал, симуляци/BiyDaalt/tests/test_network.py::test_every_single_failure_and_reroute
+23 passed in 12.06s

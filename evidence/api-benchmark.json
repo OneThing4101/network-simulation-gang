@@ -1,0 +1,11 @@
+{
+  "/api/health": 1.5141139992920216,
+  "/api/network/topologies": 55.0280980005482,
+  "/api/geography": 0.5408819997683167,
+  "/api/network/audit": 76.47125000039523,
+  "/api/export/geojson": 1.9451179996394785,
+  "/api/export/csv": 0.3006189999723574,
+  "/api/export/json": 53.88216699975601,
+  "/api/network/simulate-cut": 1.504202000432997,
+  "/api/network/path": 0.5134139992151177
+}

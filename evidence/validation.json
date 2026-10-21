@@ -1,0 +1,2067 @@
+{
+  "timestamp": "2026-10-19T19:48:01+08:00",
+  "python": "3.12.14",
+  "networkx": "3.7",
+  "cities": 22,
+  "candidate_routes": 231,
+  "geometry_checks": {
+    "Darkhan--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Selenge--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khentii--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Sainshand--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "UB--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Murun--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Mandalgovi--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Olgii--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khovd--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Tsetserleg--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "UB--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "UB--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--UB": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Erdenet": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Khentii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Darkhan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Darkhan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Darkhan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Darkhan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Darkhan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Khovd": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Darkhan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Darkhan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Darkhan--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Darkhan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--Khentii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Erdenet": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Erdenet": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Erdenet": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Erdenet": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Erdenet": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--Khovd": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Erdenet": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Erdenet": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Erdenet--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Erdenet": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khentii--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Sainshand--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Selenge--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Murun--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Mandalgovi--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Olgii--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khovd--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Selenge--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Selenge--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Selenge--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Selenge": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khentii--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khentii--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khentii--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Khentii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Khentii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Khentii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khentii--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Khentii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Khentii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khentii--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khentii--Khovd": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Khentii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khentii--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khentii--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Khentii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khentii--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Khentii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Sainshand--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Murun--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Mandalgovi--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Olgii--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khovd--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Sainshand--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Sainshand--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Sainshand--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Sainshand": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Murun--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Mandalgovi--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Olgii--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khovd--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Tsetserleg--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Ulaangom--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Ulaangom--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Ulaangom": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Mandalgovi--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Murun--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khovd--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Murun--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Murun--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Murun--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Murun": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Bulgan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Bulgan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Dalanzadgad": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Choibalsan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Khovd": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Bulgan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Bulgan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bulgan--Choir": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Bayankhongor": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Dalanzadgad": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Choibalsan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Khovd": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Bayankhongor": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Bayankhongor": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Bayankhongor--Choir": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Dalanzadgad": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Choibalsan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Khovd": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Arvaikheer": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--BaruunUrt": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Arvaikheer--Choir": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Mandalgovi--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khovd--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Mandalgovi--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Mandalgovi--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Mandalgovi--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Mandalgovi": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Dalanzadgad": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Khovd": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Dalanzadgad": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Dalanzadgad": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Dalanzadgad--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Dalanzadgad": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Khovd": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Choibalsan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Choibalsan": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choibalsan--Choir": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khovd--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Olgii--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Olgii--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Olgii--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Olgii": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Khovd": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khovd--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khovd--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Khovd": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Khovd--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Khovd": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--BaruunUrt": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Altai--Choir": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Tsetserleg--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Tsetserleg--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Tsetserleg": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Uliastai--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Zuunmod": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "BaruunUrt--Choir": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    },
+    "Choir--Uliastai": {
+      "trunk_clear": true,
+      "water_clear": true,
+      "no_lake_crossing": true,
+      "inside_country": true,
+      "endpoint_access_declared": true
+    }
+  },
+  "grid_nodes": 42499,
+  "grid_directed_edges": 330684,
+  "strict_free_components": 13,
+  "proposed_crossings": [
+    {
+      "id": "gate-24984-24985",
+      "coords": [
+        [
+          102.56713316785165,
+          47.65773113887605
+        ],
+        [
+          102.63368560869046,
+          47.65853418693487
+        ]
+      ],
+      "length_km": 5.0,
+      "status": "proposed_not_surveyed"
+    },
+    {
+      "id": "gate-30920-31153",
+      "coords": [
+        [
+          98.79582566065204,
+          48.720975284262934
+        ],
+        [
+          98.7912185053825,
+          48.76582138825314
+        ]
+      ],
+      "length_km": 5.0,
+      "status": "proposed_not_surveyed"
+    },
+    {
+      "id": "gate-22967-22968",
+      "coords": [
+        [
+          108.65092622483851,
+          47.167919424076445
+        ],
+        [
+          108.71678016914669,
+          47.16523799374245
+        ]
+      ],
+      "length_km": 5.0,
+      "status": "proposed_not_surveyed"
+    },
+    {
+      "id": "gate-21863-22078",
+      "coords": [
+        [
+          109.35249142704944,
+          46.91211618749381
+        ],
+        [
+          109.35696916350737,
+          46.956964969118395
+        ]
+      ],
+      "length_km": 5.0,
+      "status": "proposed_not_surveyed"
+    },
+    {
+      "id": "gate-25329-25570",
+      "coords": [
+        [
+          111.2091475861913,
+          47.48705691352185
+        ],
+        [
+          111.21528472624648,
+          47.5317969487998
+        ]
+      ],
+      "length_km": 5.0,
+      "status": "proposed_not_surveyed"
+    },
+    {
+      "id": "gate-25809-26044",
+      "coords": [
+        [
+          111.55249192280277,
+          47.555369059225995
+        ],
+        [
+          111.55893451821088,
+          47.60008587408499
+        ]
+      ],
+      "length_km": 5.0,
+      "status": "proposed_not_surveyed"
+    },
+    {
+      "id": "gate-36535-36815",
+      "coords": [
+        [
+          112.46856678012801,
+          49.47984213571629
+        ],
+        [
+          112.47624157753005,
+          49.524483672913966
+        ]
+      ],
+      "length_km": 5.0,
+      "status": "proposed_not_surveyed"
+    }
+  ],
+  "grid_preprocessing_ms": 3963.0006970000977,
+  "route_dijkstra_ms": 149.91009500045038,
+  "topology_compute_ms": 19.976256000518333,
+  "optimization": {
+    "status": "optimal",
+    "gap": 0.0,
+    "added": [
+      "Selenge--UB",
+      "Erdenet--Mandalgovi",
+      "Choibalsan--Khentii",
+      "Murun--Uliastai",
+      "Altai--Dalanzadgad",
+      "Khovd--Olgii"
+    ],
+    "added_cost_km": 3955.160085254298,
+    "scope": "Fixed Prim MST augmentation; candidate terrain grid routes",
+    "global_2ec_optimum": false
+  },
+  "topologies": {
+    "mst": {
+      "nodes": 22,
+      "edges": 21,
+      "km": 5889.146560862171,
+      "cost_km": 7284.113428297301,
+      "overhead_pct": 0.0,
+      "connected": true,
+      "components": [
+        [
+          "Altai",
+          "Arvaikheer",
+          "BaruunUrt",
+          "Bayankhongor",
+          "Bulgan",
+          "Choibalsan",
+          "Choir",
+          "Dalanzadgad",
+          "Darkhan",
+          "Erdenet",
+          "Khentii",
+          "Khovd",
+          "Mandalgovi",
+          "Murun",
+          "Olgii",
+          "Sainshand",
+          "Selenge",
+          "Tsetserleg",
+          "UB",
+          "Ulaangom",
+          "Uliastai",
+          "Zuunmod"
+        ]
+      ],
+      "bridge_count": 21,
+      "bridges": [
+        "Altai--Bayankhongor",
+        "Altai--Khovd",
+        "Altai--Uliastai",
+        "Arvaikheer--Bayankhongor",
+        "Arvaikheer--Mandalgovi",
+        "BaruunUrt--Choibalsan",
+        "BaruunUrt--Sainshand",
+        "Bulgan--Erdenet",
+        "Bulgan--Tsetserleg",
+        "Choir--Khentii",
+        "Choir--Mandalgovi",
+        "Choir--Sainshand",
+        "Choir--Zuunmod",
+        "Dalanzadgad--Mandalgovi",
+        "Darkhan--Selenge",
+        "Darkhan--Tsetserleg",
+        "Darkhan--Zuunmod",
+        "Khovd--Ulaangom",
+        "Murun--Ulaangom",
+        "Olgii--Ulaangom",
+        "UB--Zuunmod"
+      ],
+      "fault_tolerant": false,
+      "rtt_ms": 38.486580393620294,
+      "max_component_rtt_ms": 38.486580393620294,
+      "latency_pass": true,
+      "worst_pair": [
+        "Murun",
+        "Erdenet"
+      ],
+      "diameter_km": 3848.6580393620293
+    },
+    "protected": {
+      "nodes": 22,
+      "edges": 27,
+      "km": 9087.69919452717,
+      "cost_km": 11239.2735135516,
+      "overhead_pct": 54.3126682382435,
+      "connected": true,
+      "components": [
+        [
+          "Altai",
+          "Arvaikheer",
+          "BaruunUrt",
+          "Bayankhongor",
+          "Bulgan",
+          "Choibalsan",
+          "Choir",
+          "Dalanzadgad",
+          "Darkhan",
+          "Erdenet",
+          "Khentii",
+          "Khovd",
+          "Mandalgovi",
+          "Murun",
+          "Olgii",
+          "Sainshand",
+          "Selenge",
+          "Tsetserleg",
+          "UB",
+          "Ulaangom",
+          "Uliastai",
+          "Zuunmod"
+        ]
+      ],
+      "bridge_count": 0,
+      "bridges": [],
+      "fault_tolerant": true,
+      "rtt_ms": 28.29178617948149,
+      "max_component_rtt_ms": 28.29178617948149,
+      "latency_pass": true,
+      "worst_pair": [
+        "Olgii",
+        "Choibalsan"
+      ],
+      "diameter_km": 2829.178617948149
+    },
+    "full": {
+      "nodes": 22,
+      "edges": 231,
+      "km": 214426.9316161891,
+      "cost_km": 240893.11131256353,
+      "overhead_pct": 3541.052729799902,
+      "connected": true,
+      "components": [
+        [
+          "Altai",
+          "Arvaikheer",
+          "BaruunUrt",
+          "Bayankhongor",
+          "Bulgan",
+          "Choibalsan",
+          "Choir",
+          "Dalanzadgad",
+          "Darkhan",
+          "Erdenet",
+          "Khentii",
+          "Khovd",
+          "Mandalgovi",
+          "Murun",
+          "Olgii",
+          "Sainshand",
+          "Selenge",
+          "Tsetserleg",
+          "UB",
+          "Ulaangom",
+          "Uliastai",
+          "Zuunmod"
+        ]
+      ],
+      "bridge_count": 0,
+      "bridges": [],
+      "fault_tolerant": true,
+      "rtt_ms": 21.796811226049304,
+      "max_component_rtt_ms": 21.796811226049304,
+      "latency_pass": true,
+      "worst_pair": [
+        "Olgii",
+        "Choibalsan"
+      ],
+      "diameter_km": 2179.6811226049304
+    }
+  },
+  "failure_audit": {
+    "mst": {
+      "tested": 21,
+      "connected_after_cut": 0,
+      "worst_after_cut_rtt_ms": null,
+      "corridor_tests": 21,
+      "corridor_failures": 21,
+      "max_shared_cables": 2
+    },
+    "protected": {
+      "tested": 27,
+      "connected_after_cut": 27,
+      "worst_after_cut_rtt_ms": 44.74574680887374,
+      "corridor_tests": 27,
+      "corridor_failures": 5,
+      "max_shared_cables": 2
+    },
+    "full": {
+      "tested": 231,
+      "connected_after_cut": 231,
+      "worst_after_cut_rtt_ms": 21.815981952561266,
+      "corridor_tests": 231,
+      "corridor_failures": 2,
+      "max_shared_cables": 59
+    }
+  },
+  "local_access_cities": {
+    "UB": {
+      "coords": [
+        [
+          106.92,
+          47.92
+        ],
+        [
+          106.70040204911274,
+          47.77011893401745
+        ]
+      ],
+      "length_km": 23.406801344611686,
+      "mountain_access": true
+    },
+    "Bayankhongor": {
+      "coords": [
+        [
+          100.72,
+          46.19
+        ],
+        [
+          100.42675777575873,
+          45.81093017830346
+        ]
+      ],
+      "length_km": 47.86711578641904,
+      "mountain_access": true
+    },
+    "Arvaikheer": {
+      "coords": [
+        [
+          102.78,
+          46.26
+        ],
+        [
+          103.2590512818611,
+          45.775054857135586
+        ]
+      ],
+      "length_km": 65.43421420584903,
+      "mountain_access": true
+    },
+    "Olgii": {
+      "coords": [
+        [
+          89.96,
+          48.97
+        ],
+        [
+          90.06349990442116,
+          49.279851502507164
+        ]
+      ],
+      "length_km": 35.27757300818838,
+      "mountain_access": true
+    },
+    "Khovd": {
+      "coords": [
+        [
+          91.64,
+          48.01
+        ],
+        [
+          92.00808121785374,
+          48.1765628658479
+        ]
+      ],
+      "length_km": 33.08754956500335,
+      "mountain_access": true
+    },
+    "Altai": {
+      "coords": [
+        [
+          96.26,
+          46.37
+        ],
+        [
+          96.39364602301822,
+          46.51358170615969
+        ]
+      ],
+      "length_km": 18.979210960389945,
+      "mountain_access": true
+    },
+    "Tsetserleg": {
+      "coords": [
+        [
+          101.45,
+          47.48
+        ],
+        [
+          101.62750969526975,
+          47.82226637520376
+        ]
+      ],
+      "length_km": 40.32340314652509,
+      "mountain_access": true
+    },
+    "Zuunmod": {
+      "coords": [
+        [
+          106.95,
+          47.71
+        ],
+        [
+          106.96197773388207,
+          47.67374847362753
+        ]
+      ],
+      "length_km": 4.129675901239993,
+      "mountain_access": true
+    },
+    "Uliastai": {
+      "coords": [
+        [
+          96.85,
+          47.74
+        ],
+        [
+          96.20593386062299,
+          47.35872108841322
+        ]
+      ],
+      "length_km": 64.3998522312113,
+      "mountain_access": true
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "geography": "Supplied Natural Earth 1:10m excerpt; country, 22 admin regions, 14 lakes, 4 named mountain regions",
+  "rivers_url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_rivers_lake_centerlines.geojson",
+  "rivers_license": "Public domain",
+  "forests": "Inherited hand-drawn approximations; NOT surveyed forest boundaries",
+  "cities": "Inherited 22 approximate urban center coordinates; distances are simulated routes, NOT road survey measurements",
+  "routing": "Metric LAEA grid; strict segment tests; named mountain polygons with explicitly reported local terminal access"
+}

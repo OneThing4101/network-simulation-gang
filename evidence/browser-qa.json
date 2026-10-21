@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-10-19T19:58:22+08:00",
+  "browser": "Chromium via Chrome DevTools",
+  "passed": [
+    "MST/protected topology statistics",
+    "MST cut disconnects and isolated list shown",
+    "Protected cut reroute shown",
+    "Shortest path with active cut",
+    "Exhaustive audit 27/27 and 231/231",
+    "Manage tab: 22 nodes + 231 candidate routes",
+    "UI node add BrowserDemo -> 23 nodes; name and latitude edit; node delete -> 22",
+    "Methodology panel and source links",
+    "Desktop screenshot and mobile 390px screenshot",
+    "Mobile document width 390px; no horizontal overflow",
+    "Browser console: no errors or warnings after final build",
+    "Canonical OSM host failed in browser tunnel; automatic fallback to local vector map verified"
+  ],
+  "not_verified": [
+    "Separate Firefox/Edge runtime sessions",
+    "Online OSM tile rendering: browser ERR_TUNNEL_CONNECTION_FAILED; local offline map works"
+  ],
+  "screenshots": [
+    "dashboard-desktop.png",
+    "dashboard-mobile.png"
+  ]
+}
