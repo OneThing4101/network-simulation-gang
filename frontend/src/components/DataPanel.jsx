@@ -10,10 +10,10 @@ export default function DataPanel({data, busy, name, edgeName, onAddNode, onEdit
   const routes = data.routes.filter(r => !q || `${name(r.u)} ${name(r.v)} ${r.id}`.toLowerCase().includes(q));
   const excluded = new Set(data.excluded);
   return <>
-    <div className="panel-title"><span>Өгөгдлийн удирдлага</span><p>Зангилаа нэмэх, засах, хасах. Трассыг боломжит сангаас хасах, сэргээх. Засвар энэ компьютерт хадгалагдана.</p></div>
+    <div className="panel-title"><span>Өгөгдлийн удирдлага</span><p>Зангилаа нэмэх, засах, хасах. Трассыг боломжит сангаас хасах, сэргээх. Засвар зөвхөн энэ компьютерт хадгалагдана.</p></div>
     <div className="flex gap-2">
       <button className="btn btn-primary flex-1" disabled={!!busy} onClick={onAddNode}><Plus size={15}/>Зангилаа нэмэх</button>
-      <button className="btn" disabled={!!busy} onClick={onReset} title="Анхны 22 хотын төлөвт буцах"><RotateCcw size={15}/>Суурь төлөв</button>
+      <button className="btn" disabled={!!busy} onClick={onReset} title="Анхны 22 хотын төлөвт буцах"><RotateCcw size={15}/>Анхны төлөв</button>
     </div>
     <div className="mini-tabs" role="tablist">
       <button role="tab" aria-selected={view === 'nodes'} onClick={() => setView('nodes')}>Зангилаа · {data.cities.length}</button>

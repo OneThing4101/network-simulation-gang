@@ -14,7 +14,7 @@ export const BASEMAPS = [
   {key: 'voyager', label: 'Voyager (онлайн)', url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'},
   {key: 'osm', label: 'OpenStreetMap', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'},
   {key: 'carto-light', label: 'CARTO цайвар', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'},
-  {key: 'carto-dark', label: 'CARTO харанхуй', url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'},
+  {key: 'carto-dark', label: 'CARTO бараан', url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'},
   {key: 'topo', label: 'OpenTopoMap', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, SRTM | &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)'},
 ];
 
@@ -215,11 +215,11 @@ export default function GeoMap({data, geography, topology, selected, node, cut, 
 
   const fit = () => map.current?.fitBounds(MONGOLIA_BOUNDS, fitPadding());
   return <>
-    <div className={`map ${picking ? 'picking' : ''}`} ref={element} role="region" aria-label="Монгол улсын кабелийн сүлжээний газрын зураг"/>
+    <div className={`map ${picking ? 'picking' : ''}`} ref={element} role="region" aria-label="Монгол Улсын кабелийн сүлжээний газрын зураг"/>
     <div className="map-float zoom-stack" aria-label="Газрын зургийн удирдлага">
-      <button onClick={() => map.current?.zoomIn()} aria-label="Томруулах"><Plus size={16}/></button>
-      <button onClick={() => map.current?.zoomOut()} aria-label="Жижигрүүлэх"><Minus size={16}/></button>
-      <button onClick={fit} aria-label="Монголыг бүтнээр харах" title="Монголыг бүтнээр харах"><Crosshair size={16}/></button>
+      <button onClick={() => map.current?.zoomIn()} aria-label="Ойртуулах"><Plus size={16}/></button>
+      <button onClick={() => map.current?.zoomOut()} aria-label="Холдуулах"><Minus size={16}/></button>
+      <button onClick={fit} aria-label="Монголыг бүхэлд нь харах" title="Монголыг бүхэлд нь харах"><Crosshair size={16}/></button>
     </div>
   </>;
 }

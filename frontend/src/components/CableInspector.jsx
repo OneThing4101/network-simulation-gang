@@ -17,7 +17,7 @@ function NodeCard({node, data, topology, cut, name, onClose, onEdit, onSelectEdg
   return <>
     <div className="panel-title"><span><span className="flex items-center gap-2"><MapPin size={17}/>{node.name}</span><button className="btn btn-sm" onClick={onClose} aria-label="Хотын мэдээллийг хаах"><X size={14}/></button></span></div>
     <div className="text-[12.5px] text-slate">{node.id} · {node.lat}° N, {node.lon}° E</div>
-    {isolated && <div className="callout callout-fail">Одоогийн тасралтаар энэ хот Улаанбаатараас салсан байна.</div>}
+    {isolated && <div className="callout callout-fail">Одоогийн тасралтын улмаас энэ хот Улаанбаатараас салсан байна.</div>}
     <div>
       <div className="section-label">Холбогдсон кабель <small>{links.length}</small></div>
       {links.length ? <div className="node-list">{links.map(r => { const other = r.u === node.id ? r.v : r.u; return (
@@ -25,7 +25,7 @@ function NodeCard({node, data, topology, cut, name, onClose, onEdit, onSelectEdg
       })}</div> : <div className="empty">Энэ топологид холбогдсон кабель байхгүй.</div>}
     </div>
     <div className="flex flex-wrap gap-2">
-      <button className="btn btn-sm" onClick={() => setSource(node.id)}>Эндээс зам</button>
+      <button className="btn btn-sm" onClick={() => setSource(node.id)}>Эндээс эхлэх</button>
       <button className="btn btn-sm" onClick={() => setTarget(node.id)}>Энд хүрэх</button>
       <button className="btn btn-sm" onClick={() => onEdit(node)}><Pencil size={13}/>Засах</button>
     </div>
@@ -47,7 +47,7 @@ export default function CableInspector(props) {
           <div><small>Шулуун зай</small><b>{fmt(edge.straight_km, 1)}<span>км</span></b></div>
         </div>
         <dl className="m-0 mt-2">
-          <div className="stat-row"><dt><span className="flex items-center gap-1.5"><Route size={13}/>Саадыг тойрсон урт</span></dt><dd>+{fmt(edge.detour_pct, 1)}%</dd></div>
+          <div className="stat-row"><dt><span className="flex items-center gap-1.5"><Route size={13}/>Саад тойрсон нэмэгдэл</span></dt><dd>+{fmt(edge.detour_pct, 1)}%</dd></div>
           <div className="stat-row"><dt><span className="flex items-center gap-1.5"><Waves size={13}/>Төлөвлөсөн голын гарц</span></dt><dd>{edge.river_crossings?.length || 0}</dd></div>
           <div className="stat-row"><dt>Өртөг (weighted км)</dt><dd>{fmt(edge.cost_km)}<small>үржвэр ×{fmt(data.cost_factors[edge.id] || 1, 1)}</small></dd></div>
         </dl>
@@ -60,9 +60,9 @@ export default function CableInspector(props) {
           <button className="btn" disabled={!!busy} onClick={onFactorSave}>Хадгалах</button>
         </div>
         <button className="link link-danger mt-3" disabled={!!busy} onClick={onExclude}>Трассыг боломжит сангаас хасах</button>
-        <p className="mt-2 text-[12px] leading-relaxed text-muted">Үржвэр өөрчлөгдөхөд MST ба нөөц холбоос дахин бодогдоно.</p>
+        <p className="mt-2 text-[12px] leading-relaxed text-muted">Үржвэр өөрчлөгдөхөд MST болон нөөц холбоос дахин бодогдоно.</p>
       </details>
-    </> : <div className="empty">Карт дээр кабель дарж эсвэл дээрх жагсаалтаас сонгоно уу.</div>}
+    </> : <div className="empty">Карт дээрх кабелийг дарж эсвэл дээрх жагсаалтаас сонгоно уу.</div>}
     <PathTool {...props} />
   </>;
 }

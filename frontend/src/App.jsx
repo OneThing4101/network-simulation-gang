@@ -87,7 +87,7 @@ export default function App() {
     }
     await reload(); setCut(null); setPath(null); setModal(null); setNode(null); notify(done);
   }
-  const runCut = (topo, edgeId, sc) => perform('Тасралтыг шалгаж байна', async () => { setPath(null); setCut(await api('/api/network/simulate-cut', {topology: topo, edge_id: edgeId, scope: sc})); });
+  const runCut = (topo, edgeId, sc) => perform('Тасралтыг симуляцилж байна', async () => { setPath(null); setCut(await api('/api/network/simulate-cut', {topology: topo, edge_id: edgeId, scope: sc})); });
   const runPath = (topo, s, t, failed = []) => perform('Зам тооцож байна', async () => setPath(await api('/api/network/path', {topology: topo, source: s, target: t, failed_edges: failed})));
   const runAudit = () => perform('Бүх кабелийг шалгаж байна', async () => setAudit(await api('/api/network/audit')));
 
@@ -122,7 +122,7 @@ export default function App() {
 
   return <div className="app">
     <Header tab={tab} setTab={setTab} busy={busy} topology={topology} theme={theme} setTheme={setTheme} tourOpen={tour != null} onTour={() => tour == null ? goTour(0) : setTour(null)}/>
-    {!data ? <div className="loading">{loadError ? <><div className="alert"><AlertTriangle size={15}/><span>Сервертэй холбогдсонгүй: {loadError}</span></div><p className="m-0 text-[13px] text-slate">Backend ажиллаж байгаа эсэхийг шалгаад дахин оролдоно уу.</p><button className="btn" onClick={load}><RotateCcw size={14}/>Дахин оролдох</button></> : <><LoaderCircle className="spin" size={22}/>Маршрутын загварыг бэлтгэж байна…</>}</div>
+    {!data ? <div className="loading">{loadError ? <><div className="alert"><AlertTriangle size={15}/><span>Сервертэй холбогдсонгүй: {loadError}</span></div><p className="m-0 text-[13px] text-slate">Backend сервер ажиллаж байгаа эсэхийг шалгаад дахин оролдоно уу.</p><button className="btn" onClick={load}><RotateCcw size={14}/>Дахин оролдох</button></> : <><LoaderCircle className="spin" size={22}/>Маршрутын загварыг бэлтгэж байна…</>}</div>
     : tab === 'method' ? <Method data={data}/>
     : <div className="workspace">
       <TopologyRail data={data} topology={topology} setTopology={setTopology} name={name} edgeName={edgeName} onShowWorstPair={showWorstPair} onHover={setHover} changeSelected={changeSelected} selected={selected} busy={busy}/>
@@ -130,7 +130,7 @@ export default function App() {
         <GeoMap data={data} geography={geo} topology={topology} selected={selected} node={node} cut={cut} path={path} layers={layers} basemap={basemap} picking={!!picking} hover={hover} theme={theme}
           onSelectEdge={changeSelected} onSelectNode={selectNode} onHover={setHover}
           onPick={loc => { setModal({type: picking.type, ...picking, ...loc}); setPicking(null); }}
-          onTileFailure={() => { setBasemap('world'); setTileNotice('Онлайн суурь зураг холбогдсонгүй. Офлайн дэлхийн зургаар үргэлжилнэ.'); }}/>
+          onTileFailure={() => { setBasemap('world'); setTileNotice('Онлайн суурь зураг ачаалагдсангүй. Офлайн дэлхийн зургаар үргэлжилнэ.'); }}/>
         <div className="map-float layer-bar" role="group" aria-label="Газрын зургийн давхаргууд"><label className="basemap-pick"><Map size={12}/><select aria-label="Суурь зураг" value={basemap} onChange={e => setBasemap(e.target.value)}>{BASEMAPS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}</select></label>{LAYER_TOGGLES.map(([k, label, Icon]) => (k !== 'added' || topology === 'protected') && <button key={k} aria-pressed={layers[k]} onClick={() => setLayers({...layers, [k]: !layers[k]})}><Icon size={12}/>{label}</button>)}</div>
         {tour == null && <div className="map-float legend"><div>
           <span><i style={{color: COLORS[topology]}}/>{TOPOLOGIES.find(t => t.key === topology).short} трасс</span>
@@ -141,7 +141,7 @@ export default function App() {
           <span><i className="dashed" style={{color: '#DC992E'}}/>Уулын нэвтрэх хэсэг</span>
           <span><i className="dashed" style={{color: '#0A8786'}}/>Голын гарц</span>
         </div></div>}
-        {picking && <div className="map-float picking-note"><div>Шинэ байршлыг газрын зураг дээр дарна уу.<button onClick={() => { setModal({type: picking.type, ...picking}); setPicking(null); }}>Болих</button></div></div>}
+        {picking && <div className="map-float picking-note"><div>Шинэ байршлыг газрын зураг дээр дарж сонгоно уу.<button onClick={() => { setModal({type: picking.type, ...picking}); setPicking(null); }}>Болих</button></div></div>}
         {tour != null && <Tour step={tour} running={tourRunning} onStep={goTour} onClose={() => setTour(null)}/>}
         <div className="statusbar">
           <span className="grow">{tileNotice || (cut ? `Тасралт идэвхтэй: ${cut.failed_edges.length} кабель · ${cut.isolated.length ? `${cut.isolated.length} хот салсан` : 'бүх хот холбоотой'}` : `${data.cities.length} хот · ${data.routes.length} боломжит трасс · ${stats.edges} сонгогдсон кабель`)}</span>
@@ -158,7 +158,7 @@ export default function App() {
       onSubmit={values => perform('Маршрутыг дахин тооцож байна', () => mutation(modal.type === 'new' ? '/api/nodes' : `/api/nodes/${modal.id}`, values, modal.type === 'new' ? 'POST' : 'PATCH', modal.type === 'new' ? `${values.name} нэмэгдлээ` : `${values.name} шинэчлэгдлээ`))}
       onPickOnMap={values => { setPicking({...modal, ...values}); setModal(null); if (tab === 'method') setTab('design'); }}
       onDelete={() => perform('Зангилаа хасаж байна', () => mutation(`/api/nodes/${modal.id}`, {}, 'DELETE', `${modal.name} хасагдлаа`))}
-      onReset={() => perform('Суурь төлөв сэргээж байна', () => mutation('/api/network/reset', {}, 'POST', 'Суурь 22 хотын төлөв сэргэлээ'))}/>}
+      onReset={() => perform('Анхны төлөвийг сэргээж байна', () => mutation('/api/network/reset', {}, 'POST', 'Анхны 22 хотын төлөв сэргэлээ'))}/>}
     <Toasts items={toasts}/>
   </div>;
 }
