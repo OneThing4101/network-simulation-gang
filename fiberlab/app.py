@@ -33,6 +33,7 @@ class Store:
         self.revision = 0
         self.audit_cache = None
         self.corridor_cache = None
+        self.corridor_results = {}
         cache_path = ROOT / 'data/routes.cache.json'
         cache = json.loads(cache_path.read_text()) if cache_path.exists() else None
         cities = default_cities()
@@ -57,6 +58,7 @@ class Store:
     def save(self):
         self.audit_cache = None
         self.corridor_cache = {}
+        self.corridor_results = {}
         self.revision += 1
         if self.persist:
             directory = ROOT / '.state'
@@ -91,6 +93,33 @@ class Store:
             self.corridor_cache[key] = CorridorAnalyzer(list(self.model.routes.values()), buffer_km=key)
         return self.corridor_cache[key]
 
+    def corridor_result(self, topology, buffer_km=5.0):
+        """The shared-risk result for one topology, computed once.
+
+        The pairwise analysis over every route is the heaviest calculation in
+        the service, so the result is kept rather than recomputed. The first
+        call pays for it; every later call is a dictionary lookup.
+        """
+        key = (topology, round(float(buffer_km), 3))
+        if key in self.corridor_results:
+            return self.corridor_results[key]
+        result = build_corridor_result(self.model, topology, self.corridor_analyzer(buffer_km), buffer_km)
+        self.corridor_results[key] = result
+        return result
+
+    def prewarm_corridors(self):
+        """Compute the shared-risk analysis while the service is idle.
+
+        The full-mesh case is the slow one: every one of the 231 routes is
+        compared with every other. Doing it here means no reader ever waits
+        for it.
+        """
+        for topology in ('mst', 'protected', 'full'):
+            try:
+                self.corridor_result(topology)
+            except Exception:
+                pass
+
     def rebuild(self, cities):
         self.require_idle()
         self.busy = True
@@ -119,11 +148,58 @@ class Store:
         return job_id
 
 
+def build_corridor_result(model, topology, analyzer, buffer_km=5.0):
+    """The shared-risk picture for one topology.
+
+    Every protecting chord is checked against the tree edge it is supposed to
+    protect, so the result says how much of the "redundancy" is only logical.
+    """
+    from .evolution import coverage_map
+
+    graph = model.graphs.get(topology)
+    if graph is None:
+        return {'topology': topology, 'buffer_km': buffer_km, 'pairs': [], 'groups': [], 'coverage': [],
+                'summary': {'edges': 0, 'groups': 0, 'largest_group': [], 'shared_km': 0, 'isolated_edges': 0},
+                'policy': analyzer.policy, 'feasible': False}
+    ids = [d['id'] for _, _, d in graph.edges(data=True)]
+    every_pair = analyzer.overlaps(ids)
+    groups = analyzer.groups(ids)
+    # The full mesh produces tens of thousands of pairs; the reader needs the
+    # significant ones, not every number. The totals stay in the summary.
+    pairs = sorted(every_pair, key=lambda p: (-p['parallel_km'], -p['overlap_km']))[:60]
+    coverage = []
+    if topology == 'protected' and model.two is not None:
+        tree_edges = ['--'.join(sorted(e)) for e in model.mst.edges]
+        chosen = [(u, v, d) for u, v, d in model.full.edges(data=True)
+                  if d['id'] in set(model.optimization.get('added') or [])]
+        mapping = coverage_map(model.mst, tree_edges, chosen)
+        index = {(p['a'], p['b']): p for p in every_pair}
+        for tree_edge, chords in mapping.items():
+            for chord in chords:
+                pair = index.get(tuple(sorted((tree_edge, chord))))
+                parallel = pair['parallel_km'] if pair else 0.0
+                coverage.append({
+                    'tree_edge': tree_edge, 'chord': chord,
+                    'parallel_km': parallel,
+                    'overlap_km': pair['overlap_km'] if pair else 0.0,
+                    # A chord can protect a tree edge logically while meeting it
+                    # only at a node: the protection is then topological.
+                    'shares_corridor': parallel > 0,
+                })
+    return {'topology': topology, 'buffer_km': buffer_km, 'pairs': pairs, 'groups': groups,
+            'pair_count': len(every_pair), 'coverage': coverage, 'policy': analyzer.policy,
+            'summary': analyzer.summary(ids), 'feasible': True}
+
+
 def create_app(persist=True):
     app = Flask(__name__, static_folder=None)
     app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
     store = Store(persist=persist)
     app.extensions['network_store'] = store
+
+    # The shared-risk analysis is the heaviest calculation in the service.
+    # It runs while the service is idle so the first reader does not wait.
+    threading.Thread(target=store.prewarm_corridors, daemon=True).start()
 
     @app.after_request
     def compress(response):
@@ -212,39 +288,8 @@ def create_app(persist=True):
         if not 0.1 <= buffer_km <= 100:
             raise ValueError('Коридорын өргөн 0.1–100 км байна.')
         with store.lock:
-            model = store.model
-            graph = model.graphs.get(topology)
-            ids = [d['id'] for _, _, d in graph.edges(data=True)] if graph is not None else []
-            analyzer = store.corridor_analyzer(buffer_km)
-            pairs = analyzer.overlaps(ids)
-            groups = analyzer.groups(ids)
-            # The question the whole module exists for: does an added chord
-            # protect a tree edge it actually shares ground with?
-            coverage = []
-            if topology == 'protected' and model.two is not None:
-                from .evolution import coverage_map
-                tree_edges = ['--'.join(sorted(e)) for e in model.mst.edges]
-                chosen = [(u, v, d) for u, v, d in model.full.edges(data=True)
-                          if d['id'] in set(model.optimization.get('added') or [])]
-                mapping = coverage_map(model.mst, tree_edges, chosen)
-                pair_index = {(p['a'], p['b']): p for p in pairs}
-                for tree_edge, chords in mapping.items():
-                    for chord in chords:
-                        key = tuple(sorted((tree_edge, chord)))
-                        pair = pair_index.get(key)
-                        parallel = pair['parallel_km'] if pair else 0.0
-                        coverage.append({
-                            'tree_edge': tree_edge, 'chord': chord,
-                            'parallel_km': parallel,
-                            'overlap_km': pair['overlap_km'] if pair else 0.0,
-                            # A chord can protect a tree edge logically while
-                            # meeting it only at a node: the protection is then
-                            # topological, not physical.
-                            'shares_corridor': parallel > 0,
-                        })
-            return jsonify(topology=topology, buffer_km=buffer_km, pairs=pairs, groups=groups,
-                           coverage=coverage, policy=analyzer.policy,
-                           summary=analyzer.summary(ids), revision=store.revision)
+            result = store.corridor_result(topology, buffer_km)
+            return jsonify(**result, revision=store.revision)
 
     @app.post('/api/network/impact')
     def impact():
