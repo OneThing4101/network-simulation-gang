@@ -4,11 +4,14 @@ import { Crosshair, Minus, Plus } from 'lucide-react';
 import { COLORS, MONGOLIA_BOUNDS, HIGHLIGHT, FAIL, fmt } from '../constants';
 import { FlowLayer } from './flowLayer';
 
-// Offline shaded-relief backdrop (Natural Earth hypsometric tint), cropped to this box by scripts/make_relief.py.
+// Offline shaded-relief backdrop (Natural Earth gray relief), cropped to this box by scripts/make_relief.py.
 export const RELIEF_BOUNDS = [[41.0, 87.0], [52.5, 120.5]];
+// 'world' is an offline vector world (Natural Earth land + lakes, scripts/make_world.py) drawn in an Apple Maps-like
+// cream/blue palette; the online styles sit on top of it, so a tile outage degrades to the same look without labels.
 export const BASEMAPS = [
-  {key: 'relief', label: 'Рельеф (офлайн)'},
-  {key: 'plain', label: 'Энгийн (офлайн)'},
+  {key: 'world', label: 'Дэлхий (офлайн)'},
+  {key: 'relief', label: 'Дэлхий + рельеф (офлайн)'},
+  {key: 'voyager', label: 'Voyager (онлайн)', url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'},
   {key: 'osm', label: 'OpenStreetMap', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'},
   {key: 'carto-light', label: 'CARTO цайвар', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'},
   {key: 'carto-dark', label: 'CARTO харанхуй', url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'},
@@ -17,12 +20,20 @@ export const BASEMAPS = [
 
 // Geography palette per theme. Cable colours never change: they are fixed by the assignment.
 const PALETTE = {
-  light: {country: {color: '#6B7C86', fill: .04}, aimag: {color: '#A3B2B9', fill: 0}, mountain: {color: '#6F8290', fill: .13}, lake: {color: '#5FAFD3', fill: .6}, river: {color: '#4A9FC9', fill: 0}, forest: {color: '#6E9466', fill: .13}, marker: '#2E3F4D', focus: '#16232E', markerFill: '#fff', casing: '#fff', soum: '#8A9AA3'},
-  dark: {country: {color: '#8FA3B0', fill: .07}, aimag: {color: '#4A5B66', fill: 0}, mountain: {color: '#9FB0BC', fill: .12}, lake: {color: '#3E88AD', fill: .55}, river: {color: '#3E88AD', fill: 0}, forest: {color: '#5B7D55', fill: .18}, marker: '#D5DEE3', focus: '#F2F4F3', markerFill: '#1B2730', casing: '#111A21', soum: '#4F6270'},
+  light: {country: {color: '#7C8A95', fill: .72, fillColor: '#FFFFFF'}, aimag: {color: '#B4C0C7', fill: 0}, mountain: {color: '#6F8290', fill: .12}, lake: {color: '#7FB9DE', fill: .9, fillColor: '#BFDBF0'}, river: {color: '#7FB9DE', fill: 0}, forest: {color: '#6E9466', fill: .13}, marker: '#2E3F4D', focus: '#16232E', markerFill: '#fff', casing: '#fff', soum: '#A3B2B9',
+    land: {color: '#D9D3C9', fill: 1, fillColor: '#F4F2ED'}, worldLake: {color: '#BFDBF0', fill: 1, fillColor: '#BFDBF0'}},
+  dark: {country: {color: '#8FA3B0', fill: .5, fillColor: '#223039'}, aimag: {color: '#4A5B66', fill: 0}, mountain: {color: '#9FB0BC', fill: .12}, lake: {color: '#3E88AD', fill: .9, fillColor: '#12222E'}, river: {color: '#3E88AD', fill: 0}, forest: {color: '#5B7D55', fill: .18}, marker: '#D5DEE3', focus: '#F2F4F3', markerFill: '#1B2730', casing: '#111A21', soum: '#4F6270',
+    land: {color: '#2C3A45', fill: 1, fillColor: '#1B2630'}, worldLake: {color: '#12222E', fill: 1, fillColor: '#12222E'}},
 };
-const WEIGHT = {country: 1.4, aimag: .6, mountain: .7, lake: .7, river: 1.6, forest: .6};
+const WEIGHT = {country: 1.2, aimag: .6, mountain: .7, lake: .7, river: 1.6, forest: .6};
+const geoStyle = (s, weight, extra = {}) => ({color: s.color, weight, fillColor: s.fillColor || s.color, fillOpacity: s.fill, interactive: false, ...extra});
 // Label placement tuned by hand so names in the dense centre do not collide.
 const LABEL_DIR = {Zuunmod: 'bottom', Bulgan: 'left', Erdenet: 'top', Darkhan: 'right', UB: 'top', Bayankhongor: 'left', Arvaikheer: 'right', Mandalgovi: 'bottom', Choir: 'right', Khentii: 'top', Tsetserleg: 'left', Uliastai: 'bottom'};
+// Floating side cards cover the map edges on desktop; keep Mongolia centred in the gap between them.
+const fitPadding = () => {
+  const w = el => (window.innerWidth > 960 && document.querySelector(el)?.offsetWidth) || 0;
+  return {paddingTopLeft: [w('.rail') + 34, 70], paddingBottomRight: [w('.panel') + 34, 70]};
+};
 const text = value => { const el = document.createElement('span'); el.textContent = value; return el; };
 const toLatLng = coords => coords.map(([lon, lat]) => [lat, lon]);
 
@@ -30,29 +41,62 @@ export default function GeoMap({data, geography, topology, selected, node, cut, 
   const element = useRef(null), map = useRef(null), drawn = useRef(null), tiles = useRef(null), lines = useRef({});
   const soums = useRef({data: null, loading: false, lines: null, labels: null, aimags: null});
   const relief = useRef(null), flow = useRef(null);
+  const world = useRef({data: null, loading: false, layer: null, labels: null});
   const handlers = useRef({});
   handlers.current = {onPick, onTileFailure, onHover, picking};
 
   useEffect(() => {
-    const m = L.map(element.current, {zoomControl: false, attributionControl: true, minZoom: 4, maxZoom: 13, zoomSnap: .1, preferCanvas: true});
-    m.fitBounds(MONGOLIA_BOUNDS, {padding: [18, 18]});
+    const m = L.map(element.current, {zoomControl: false, attributionControl: true, minZoom: 2, maxZoom: 13, zoomSnap: .1, preferCanvas: true, worldCopyJump: true});
+    m.fitBounds(MONGOLIA_BOUNDS, fitPadding());
     m.attributionControl.setPrefix('').addAttribution('Natural Earth · сургалтын загвар');
     relief.current = L.imageOverlay('/relief.webp', RELIEF_BOUNDS, {opacity: 1, interactive: false, className: 'relief-image', pane: 'tilePane'});
     flow.current = new FlowLayer();
     m.on('click', e => { if (handlers.current.picking) handlers.current.onPick?.({lat: e.latlng.lat.toFixed(4), lon: e.latlng.lng.toFixed(4)}); });
-    // Soum boundaries and labels sit under the cables so the network always reads first.
+    // World land sits under the tile pane (200) so an online style covers it; soums and labels under the cables.
+    m.createPane('world').style.zIndex = 150;
     m.createPane('soums').style.zIndex = 350;
     m.createPane('soumLabels').style.zIndex = 360;
-    m.on('zoomend', () => handlers.current.refreshSoums?.());
+    // City name tags only make sense once Mongolia is more than a thumbnail.
+    const far = () => element.current.classList.toggle('zoom-far', m.getZoom() < 4.6);
+    far();
+    m.on('zoomend', () => { far(); handlers.current.refreshSoums?.(); handlers.current.refreshWorld?.(); });
     map.current = m;
     // The stage gets its final size after first paint; refit once so Mongolia fills the map.
-    let fitted = false;
-    const observer = new ResizeObserver(() => { m.invalidateSize(); if (!fitted && element.current.clientHeight > 200) { fitted = true; m.fitBounds(MONGOLIA_BOUNDS, {padding: [18, 18]}); } });
+    let fitted = false, narrow = window.innerWidth <= 960;
+    const observer = new ResizeObserver(() => {
+      m.invalidateSize();
+      const nowNarrow = window.innerWidth <= 960;
+      if ((!fitted && element.current.clientHeight > 200) || nowNarrow !== narrow) { fitted = true; narrow = nowNarrow; m.fitBounds(MONGOLIA_BOUNDS, fitPadding()); }
+    });
     observer.observe(element.current);
     return () => { observer.disconnect(); m.remove(); };
   }, []);
 
-  // Basemap: offline relief / plain vector, or an online tile style. A failing tile source falls back to relief.
+  // Offline world: land and big lakes always, country names only while zoomed out (aimag names take over from 5.5).
+  const refreshWorld = () => {
+    const m = map.current, st = world.current;
+    if (!m) return;
+    if (!st.data && !st.loading) {
+      st.loading = true;
+      fetch('/world.geojson').then(r => r.json()).then(d => { st.data = d; st.loading = false; refreshWorld(); }).catch(() => { st.loading = false; });
+      return;
+    }
+    if (!st.data) return;
+    const pal = PALETTE[theme] || PALETTE.light, z = m.getZoom();
+    if (!st.layer) st.layer = L.geoJSON(st.data, {pane: 'world', interactive: false, style: f => f.properties.k === 'lake' ? geoStyle(pal.worldLake, .5) : geoStyle(pal.land, .8)}).addTo(m);
+    else st.layer.setStyle(f => f.properties.k === 'lake' ? geoStyle(pal.worldLake, .5) : geoStyle(pal.land, .8));
+    // Each label carries Natural Earth's minimum zoom; Mongolia itself is labelled by its cities.
+    const want = z < 5.5 ? st.data.labels.filter(l => l.a !== 'MN' && l.s <= z) : [];
+    const key = want.map(l => l.a).join();
+    if (st.labels && st.labelKey === key) return;
+    st.labels?.remove();
+    st.labelKey = key;
+    st.labels = want.length ? L.layerGroup(want.map(l => L.marker([l.c[1], l.c[0]], {pane: 'soumLabels', interactive: false, keyboard: false, icon: L.divIcon({className: 'country-label', html: `<span>${l.n}</span>`, iconSize: null})}))).addTo(m) : null;
+  };
+  handlers.current.refreshWorld = refreshWorld;
+  useEffect(() => { refreshWorld(); }, [theme]);
+
+  // Basemap: offline world (optionally with relief inside Mongolia) or an online tile style over it. A failing tile source falls back to the offline world.
   useEffect(() => {
     const m = map.current; if (!m) return;
     tiles.current?.remove(); tiles.current = null;
@@ -112,7 +156,7 @@ export default function GeoMap({data, geography, topology, selected, node, cut, 
 
     L.geoJSON(geography, {
       filter: f => ['country', 'aimag'].includes(f.properties.kind) || layers[f.properties.kind],
-      style: f => { const k = f.properties.kind, s = pal[k] || pal.aimag; return {color: s.color, weight: WEIGHT[k] || .6, fillColor: s.color, fillOpacity: s.fill, dashArray: k === 'mountain' ? '4 4' : null, interactive: false}; },
+      style: f => { const k = f.properties.kind; return geoStyle(pal[k] || pal.aimag, WEIGHT[k] || .6, {dashArray: k === 'mountain' ? '4 4' : null}); },
       interactive: false,
     }).addTo(group);
 
@@ -169,7 +213,7 @@ export default function GeoMap({data, geography, topology, selected, node, cut, 
     if (l) { l.setStyle({weight: Math.max(l.base.weight + 2.5, 5), opacity: 1}); l.bringToFront(); }
   }, [hover]);
 
-  const fit = () => map.current?.fitBounds(MONGOLIA_BOUNDS, {padding: [18, 18]});
+  const fit = () => map.current?.fitBounds(MONGOLIA_BOUNDS, fitPadding());
   return <>
     <div className={`map ${picking ? 'picking' : ''}`} ref={element} role="region" aria-label="Монгол улсын кабелийн сүлжээний газрын зураг"/>
     <div className="map-float zoom-stack" aria-label="Газрын зургийн удирдлага">

@@ -96,9 +96,34 @@ FIBER ATLAS — FRONTEND UI/UX АЖЛЫН ТАЙЛАН
   унтарна.
 
 ======================================================================
+5b. ШАТ 5 — ДЭЛХИЙН ЗУРАГ, ХӨВӨГЧ САМБАР, ЦАГААН ӨНГӨ (2026-10-22)
+======================================================================
+- Газрын зураг Apple Maps маягийн дэлхийн зураг боллоо: Natural Earth
+  1:50m улсуудын хил, том нуурууд (scripts/make_world.py →
+  frontend/public/world.geojson, 647 KB, офлайн). Хуурай газар цайвар
+  шаргал, далай цэнхэр, Монгол цагаан дүүргэлттэй. Zoom 2-оос эхэлнэ,
+  дэлхийг бүхэлд нь гүйлгэж болно; улсын нэр (монголоор) Natural Earth-ийн
+  MIN_LABEL zoom-оор аажмаар гарна, Монголын хотын нэр zoom 4.6-аас.
+- Суурь зургийн сонголт: Дэлхий (офлайн) — анхдагч, Дэлхий + рельеф,
+  Voyager (онлайн, Apple-тай төстэй), OSM, CARTO, OpenTopoMap. Онлайн
+  tile ачаалагдахгүй бол офлайн дэлхийн зураг руу чимээгүй буцна.
+- Хоёр талын самбар бусад багийнхаас ялгаатай болгов: газрын зураг
+  бүтэн дэлгэцээр, зүүн/баруун самбар нь Apple Maps шиг хөвөгч, булан
+  дугуй, blur-тэй цагаан карт. Давхарга, легенд, zoom товчлуурууд хоёр
+  картын завсарт байрлана. fitBounds самбарын өргөнийг тооцно.
+- Зүүн самбар: топологи сонголт segmented control (MST / 2-Edge / Full
+  mesh), үзүүлэлтүүд KPI tile хэлбэрээр (урт, кабель, bridge, RTT, өртөг,
+  хамгийн урт зам). Bridge-тэй үед улаан, bridge-гүй үед ногоон tile.
+- Өнгө: анхны цагаан дизайн руу буцаав — цайвар горим анхдагч (OS-ийн
+  харанхуй тохиргоог дагахгүй), самбарууд цагаан. Харанхуй горим товчоор
+  сонгож болно.
+- ≤960px: самбарууд картаас энгийн блок болж, зураг дээр/доор дарааллан
+  байрлана; дэлгэцийн өргөн солигдоход зураг дахин төвлөрнө.
+
+======================================================================
 6. ШАЛГАЛТ
 ======================================================================
-- Chromium (Playwright): 4 таб, тасралт (MST/2-Edge/зурвас), tour,
+- Chromium (Playwright / Chrome DevTools): 4 таб, тасралт (MST/2-Edge/зурвас), tour,
   node modal, харанхуй горим, 390px утас — console алдаагүй.
 - Production build: npm run build → frontend/dist (Flask үүнийг serve
   хийнэ). Дахин build хийсний дараа Ctrl+Shift+R шаардлагатай
@@ -112,7 +137,8 @@ FIBER ATLAS — FRONTEND UI/UX АЖЛЫН ТАЙЛАН
 Шинэ:  frontend/src/App.jsx, frontend/src/api.js, frontend/src/constants.js,
        frontend/src/components/*.jsx, frontend/src/components/flowLayer.js,
        frontend/public/soums.geojson, frontend/public/relief.webp,
-       scripts/make_relief.py, tailan.txt
+       frontend/public/world.geojson, scripts/make_relief.py,
+       scripts/make_world.py, tailan.txt
 Засвар: frontend/src/main.jsx, frontend/src/style.css, frontend/index.html,
        frontend/vite.config.js, frontend/package.json (+@fontsource/ibm-plex-sans),
        frontend/public/favicon.svg, README.md, evidence/dashboard-*.png

@@ -95,3 +95,7 @@ curl -s http://127.0.0.1:5080/api/network/simulate-cut \
 ```
 
 Топологи/API-ийн warm хариу ба хүйтэн торын preprocessing тусдаа хэмжигдэнэ. Зангилаа засахад HTTP 202 + job ID буцааж, background бодолт дуусмагц шинэ зөв төлөвийг хадгална. Бодолт амжилтгүй бол өмнөх зөв төлөвөө хадгална. Энэ сургалтын локал хувилбар 48 хүртэл зангилааны оролтыг зөвшөөрнө.
+
+## Дэлхийн суурь зураг
+
+Газрын зураг анхдагчаар офлайн дэлхийн зургийг (Natural Earth 1:50m, `frontend/public/world.geojson`) Apple Maps маягийн цайвар өнгөөр харуулна. Дахин үүсгэх: `python scripts/make_world.py --countries ne_50m_admin_0_countries.shp --lakes ne_50m_lakes.shp`. Онлайн хэв маяг (Voyager, OSM, CARTO, OpenTopoMap) давхарга самбараас сонгоно; холбогдохгүй бол офлайн зураг руу буцна.

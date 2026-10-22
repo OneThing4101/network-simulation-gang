@@ -21,9 +21,10 @@ function readHash() {
   const p = new URLSearchParams(location.hash.slice(1));
   return {tab: TAB_KEYS.includes(p.get('tab')) ? p.get('tab') : 'design', topology: TOPOLOGIES.some(t => t.key === p.get('topo')) ? p.get('topo') : 'protected', selected: p.get('edge') || 'Murun--Uliastai'};
 }
+// Light is the default regardless of the OS setting; dark stays an explicit choice behind the toggle.
 function initialTheme() {
-  try { const saved = localStorage.getItem('fiber-theme'); if (saved === 'dark' || saved === 'light') return saved; } catch {}
-  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  try { const saved = localStorage.getItem('fiber-theme-v2'); if (saved === 'dark' || saved === 'light') return saved; } catch {}
+  return 'light';
 }
 
 export default function App() {
@@ -33,7 +34,7 @@ export default function App() {
   const [selected, setSelected] = useState(start.selected), [node, setNode] = useState(null), [hover, setHover] = useState(null);
   const [cut, setCut] = useState(null), [path, setPath] = useState(null), [scope, setScope] = useState('cable');
   const [layers, setLayers] = useState({mountain: true, lake: true, river: true, forest: false, access: true, bridges: true, added: true, soums: true, flow: true});
-  const [basemap, setBasemap] = useState(() => { try { return localStorage.getItem('fiber-basemap') || 'relief'; } catch { return 'relief'; } });
+  const [basemap, setBasemap] = useState(() => { try { const b = localStorage.getItem('fiber-basemap-v2'); return BASEMAPS.some(x => x.key === b) ? b : 'world'; } catch { return 'world'; } });
   const [source, setSource] = useState('Darkhan'), [target, setTarget] = useState('Khentii'), [audit, setAudit] = useState(null);
   const [busy, setBusy] = useState(''), [error, setError] = useState(''), [modal, setModal] = useState(null), [factor, setFactor] = useState(1);
   const [picking, setPicking] = useState(null); // form values carried while the user clicks the map
@@ -59,8 +60,8 @@ export default function App() {
   const load = useCallback(() => { setLoadError(''); Promise.all([reload(), api('/api/geography').then(setGeo)]).catch(e => setLoadError(e.message)); }, [reload]);
 
   useEffect(() => { alive.current = true; load(); return () => { alive.current = false; }; }, [load]);
-  useEffect(() => { try { localStorage.setItem('fiber-basemap', basemap); } catch {} }, [basemap]);
-  useEffect(() => { document.documentElement.dataset.theme = theme; try { localStorage.setItem('fiber-theme', theme); } catch {} }, [theme]);
+  useEffect(() => { try { localStorage.setItem('fiber-basemap-v2', basemap); } catch {} }, [basemap]);
+  useEffect(() => { document.documentElement.dataset.theme = theme; try { localStorage.setItem('fiber-theme-v2', theme); } catch {} }, [theme]);
   useEffect(() => { history.replaceState(null, '', `#tab=${tab}&topo=${topology}&edge=${encodeURIComponent(selected)}`); }, [tab, topology, selected]);
   useEffect(() => { setCut(null); setPath(null); if (data && !data.topologies[topology].edge_ids.includes(selected)) setSelected(data.topologies[topology].edge_ids[0]); }, [topology, data]);
   useEffect(() => { setFactor(data?.cost_factors[selected] || 1); }, [selected, data]);
@@ -129,7 +130,7 @@ export default function App() {
         <GeoMap data={data} geography={geo} topology={topology} selected={selected} node={node} cut={cut} path={path} layers={layers} basemap={basemap} picking={!!picking} hover={hover} theme={theme}
           onSelectEdge={changeSelected} onSelectNode={selectNode} onHover={setHover}
           onPick={loc => { setModal({type: picking.type, ...picking, ...loc}); setPicking(null); }}
-          onTileFailure={() => { setBasemap('relief'); setTileNotice('Онлайн суурь зураг холбогдсонгүй. Офлайн рельефээр үргэлжилнэ.'); notify('Онлайн tile холбогдсонгүй, офлайн рельеф хэвээр', 'fail'); }}/>
+          onTileFailure={() => { setBasemap('world'); setTileNotice('Онлайн суурь зураг холбогдсонгүй. Офлайн дэлхийн зургаар үргэлжилнэ.'); }}/>
         <div className="map-float layer-bar" role="group" aria-label="Газрын зургийн давхаргууд"><label className="basemap-pick"><Map size={12}/><select aria-label="Суурь зураг" value={basemap} onChange={e => setBasemap(e.target.value)}>{BASEMAPS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}</select></label>{LAYER_TOGGLES.map(([k, label, Icon]) => (k !== 'added' || topology === 'protected') && <button key={k} aria-pressed={layers[k]} onClick={() => setLayers({...layers, [k]: !layers[k]})}><Icon size={12}/>{label}</button>)}</div>
         {tour == null && <div className="map-float legend"><div>
           <span><i style={{color: COLORS[topology]}}/>{TOPOLOGIES.find(t => t.key === topology).short} трасс</span>

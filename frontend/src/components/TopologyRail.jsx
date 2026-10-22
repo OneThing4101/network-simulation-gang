@@ -1,8 +1,9 @@
 import { Route } from 'lucide-react';
 import { COLORS, TOPOLOGIES, fmt } from '../constants';
 
-// Left rail: pick a topology, read its headline numbers, compare it with the other two.
+// Left card: segmented topology switch, KPI tiles for the chosen one, the added ring links, and a length comparison.
 export default function TopologyRail({data, topology, setTopology, name, edgeName, onShowWorstPair, onHover, changeSelected, selected, busy}) {
+  const current = TOPOLOGIES.find(t => t.key === topology);
   const stats = data.topologies[topology].stats;
   const fullKm = data.topologies.full.stats.km;
   const mstKm = data.topologies.mst.stats.km;
@@ -10,26 +11,23 @@ export default function TopologyRail({data, topology, setTopology, name, edgeNam
   const routeOf = id => data.routes.find(r => r.id === id);
   return <aside className="rail" aria-label="Топологи ба үзүүлэлт">
     <div className="section-label">Топологи <small>1 · 2 · 3 товчлуур</small></div>
-    <div className="topo-list" role="radiogroup" aria-label="Топологи сонгох">
+    <div className="topo-seg" role="radiogroup" aria-label="Топологи сонгох">
       {TOPOLOGIES.map(t => { const s = data.topologies[t.key].stats; return (
         <button key={t.key} className="topo" role="radio" aria-checked={topology === t.key} onClick={() => setTopology(t.key)}>
-          <i className="swatch" style={{background: COLORS[t.key]}}/>
-          <span><b>{t.short === 'MST' ? 'MST' : t.name}</b><small>{t.hint}</small></span>
-          <em>{s.edges} кабель</em>
+          <b>{t.short}</b><em>{s.edges} кабель</em><i style={{background: COLORS[t.key]}}/>
         </button>);
       })}
     </div>
+    <p className="topo-desc"><b>{current.name}</b><span>{current.hint}</span></p>
 
-    <div className="hero-stat">
-      <b>{fmt(stats.km)}<small>км</small></b>
-      <span>{topology === 'mst' ? 'Хамгийн бага бүрхэгч модны нийт урт' : `MST-ээс ${fmt(stats.overhead_pct, 1)}% илүү кабель`}</span>
+    <div className="kpis">
+      <div className="kpi wide"><small>Нийт кабелийн урт</small><b>{fmt(stats.km)}<span>км</span></b><em>{topology === 'mst' ? 'Хамгийн бага бүрхэгч модны нийт урт' : `MST-ээс ${fmt(stats.overhead_pct, 1)}% илүү кабель`}</em></div>
+      <div className="kpi"><small>Кабель</small><b>{stats.edges}</b><em>{data.cities.length} хот · {stats.connected ? 'нэгдсэн' : 'салангид'}</em></div>
+      <div className={`kpi ${stats.fault_tolerant ? 'ok' : 'fail'}`}><small>Критик холбоос</small><b>{stats.bridge_count}<span>bridge</span></b><em>{stats.fault_tolerant ? 'Нэг тасралт даана' : 'Нэг тасралтад хот сална'}</em></div>
+      <div className={`kpi ${stats.latency_pass ? '' : 'fail'}`}><small>Хамгийн их RTT</small><b>{fmt(stats.rtt_ms, 1)}<span>мс</span></b><em>хязгаар 50 мс</em></div>
+      <div className="kpi"><small>Өртөг</small><b>{fmt(stats.cost_km)}</b><em>terrain-weighted км</em></div>
+      {stats.worst_pair && <div className="kpi wide"><small>Хамгийн урт зам</small><button className="link" disabled={!!busy} onClick={onShowWorstPair} title="Энэ хоёр хотын замыг карт дээр харуулах"><Route size={11}/>{name(stats.worst_pair[0])} — {name(stats.worst_pair[1])}</button></div>}
     </div>
-    <dl className="m-0">
-      <div className="stat-row"><dt>Кабелийн тоо</dt><dd>{stats.edges}<small>{data.cities.length} хот, {stats.connected ? 'нэгдсэн сүлжээ' : 'салангид хэсэгтэй'}</small></dd></div>
-      <div className="stat-row"><dt>Критик холбоос</dt><dd className={stats.fault_tolerant ? 'text-ok' : 'text-fail'}>{stats.bridge_count} bridge<small>{stats.fault_tolerant ? 'Нэг кабелийн тасралт даана' : 'Нэг кабель тасрахад хот тусгаарлагдана'}</small></dd></div>
-      <div className="stat-row"><dt>Хамгийн их RTT</dt><dd className={stats.latency_pass ? '' : 'text-fail'}>{fmt(stats.rtt_ms, 1)} мс<small>{stats.worst_pair ? <button className="link text-[11px]" disabled={!!busy} onClick={onShowWorstPair} title="Энэ хоёр хотын замыг карт дээр харуулах"><Route size={11}/>{name(stats.worst_pair[0])} — {name(stats.worst_pair[1])}</button> : '—'} · хязгаар 50 мс</small></dd></div>
-      <div className="stat-row"><dt>Өртөг</dt><dd>{fmt(stats.cost_km)}<small>terrain-weighted км</small></dd></div>
-    </dl>
 
     {added.length > 0 && <div className="mt-4">
       <div className="section-label">Нэмсэн нөөц холбоос <small>{added.length} · +{fmt(data.optimization.added_cost_km)} w-км</small></div>
