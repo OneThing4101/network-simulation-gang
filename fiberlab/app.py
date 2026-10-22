@@ -231,11 +231,16 @@ def create_app(persist=True):
                 for tree_edge, chords in mapping.items():
                     for chord in chords:
                         key = tuple(sorted((tree_edge, chord)))
-                        pair = pair_index.get(key) or pair_index.get((key[1], key[0]))
+                        pair = pair_index.get(key)
+                        parallel = pair['parallel_km'] if pair else 0.0
                         coverage.append({
                             'tree_edge': tree_edge, 'chord': chord,
-                            'parallel_km': pair['parallel_km'] if pair else 0.0,
+                            'parallel_km': parallel,
                             'overlap_km': pair['overlap_km'] if pair else 0.0,
+                            # A chord can protect a tree edge logically while
+                            # meeting it only at a node: the protection is then
+                            # topological, not physical.
+                            'shares_corridor': parallel > 0,
                         })
             return jsonify(topology=topology, buffer_km=buffer_km, pairs=pairs, groups=groups,
                            coverage=coverage, policy=analyzer.policy,

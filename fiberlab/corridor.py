@@ -181,7 +181,9 @@ class CorridorAnalyzer:
                 for position in range(len(first)):
                     if shared[position] <= 0:
                         continue
-                    a_id, b_id = self._ids[first[position]], self._ids[second[position]]
+                    # The pair key is ordered by id, not by route index, so a
+                    # caller can look a pair up from two ids in any order.
+                    a_id, b_id = sorted((self._ids[first[position]], self._ids[second[position]]))
                     base = float(min(self._lengths[first[position]], self._lengths[second[position]]))
                     proximity = float(shared[position]) / 1000.0
                     # Sampling can overshoot the exact intersection by a metre;

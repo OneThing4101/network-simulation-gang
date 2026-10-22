@@ -11,3 +11,7 @@ frontend/node_modules/
 # OS / editor
 .DS_Store
 Thumbs.db
+# browser test artefacts
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/

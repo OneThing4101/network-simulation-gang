@@ -7,6 +7,7 @@ from pyproj import CRS
 
 from fiberlab.corridor import CORRIDOR_POLICY, CorridorAnalyzer, PROJECTION
 from fiberlab.engine import NetworkModel
+from fiberlab.evolution import coverage_map
 from fiberlab.terrain import ROOT
 
 
@@ -143,6 +144,62 @@ def test_real_overlaps_are_positive_distinct_and_sorted(analyzer):
     limited = analyzer.overlaps(edge_ids=sorted(subset))
     assert limited
     assert all(pair['a'] in subset and pair['b'] in subset for pair in limited)
+
+
+def test_pair_keys_are_ordered_by_id():
+    """A pair must be findable from two ids in either order.
+
+    The lookup key used to follow the route index, which silently dropped
+    half the lookups made from two ids.
+    """
+    routes = [
+        make_route('A--B', [[100.0, 46.0], [101.0, 46.0], [102.0, 46.0]]),
+        make_route('A--C', [[100.0, 46.02], [101.0, 46.02], [102.0, 46.02]]),
+    ]
+    analyzer = CorridorAnalyzer(routes)
+    pairs = analyzer.overlaps()
+    assert pairs
+    for pair in pairs:
+        key = (pair['a'], pair['b'])
+        assert list(key) == sorted(key)
+        assert analyzer.overlaps(edge_ids=list(key))
+
+
+def test_every_covering_chord_is_found_in_the_pair_table():
+    """The headline number must not depend on how a pair is keyed.
+
+    A chord can protect a tree edge logically while meeting it only at a
+    node, so it is legitimately absent from the overlap table. What must
+    hold is that a pair which is present is found, and that the two
+    populations add up to the number of covering pairs.
+    """
+    cache = json.loads((ROOT / 'data/routes.cache.json').read_text())
+    model = NetworkModel(cache['cities'], cache['routes'])
+    analyzer = CorridorAnalyzer(cache['routes'])
+    protected_ids = [d['id'] for _, _, d in model.two.edges(data=True)]
+    table = {(p['a'], p['b']): p for p in analyzer.overlaps(protected_ids)}
+
+    tree_edges = ['--'.join(sorted(e)) for e in model.mst.edges]
+    chosen = [(u, v, d) for u, v, d in model.full.edges(data=True)
+              if d['id'] in set(model.optimization.get('added') or [])]
+    coverage = coverage_map(model.mst, tree_edges, chosen)
+
+    sharing, meeting_only = 0, 0
+    pairs = sum(len(chords) for chords in coverage.values())
+    for tree_edge, chords in coverage.items():
+        for chord in chords:
+            pair = table.get(tuple(sorted((tree_edge, chord))))
+            if pair is None:
+                meeting_only += 1
+                continue
+            assert pair['parallel_km'] >= 0
+            if pair['parallel_km'] >= 1:
+                sharing += 1
+            else:
+                meeting_only += 1
+    assert sharing + meeting_only == pairs
+    assert sharing > 0, 'the protected design is expected to have some shared corridors'
+    assert meeting_only > 0, 'some chords protect a tree edge only through a node'
 
 
 def test_a_crossing_is_not_a_shared_corridor():

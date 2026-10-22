@@ -102,6 +102,7 @@ export default function ResiliencePanel({
 
     {corridor?.coverage?.length > 0 && (() => {
       const shared = corridor.coverage.filter(item => item.parallel_km >= 1);
+      const meetingOnly = corridor.coverage.length - shared.length;
       const worst = [...shared].sort((a, b) => b.parallel_km - a.parallel_km)[0];
       if (!worst) return null;
       return <div>
@@ -109,6 +110,7 @@ export default function ResiliencePanel({
         <div className="callout callout-fail" style={{flexDirection: 'column', alignItems: 'stretch', gap: 8}}>
           <span><strong>{shared.length} нэмэлт холбоос</strong> байгаа нь хамгаалж байгаа модны холбоосоо <strong>1 км-ээс дээш</strong> уртаар зэрэгцээ явж байна.</span>
           <span>Хамгийн их нь <strong className="num">{fmt(worst.parallel_km, 1)} км</strong>: <strong>{label(worst.tree_edge)}</strong> холбоосыг хамгаалах <strong>{label(worst.chord)}</strong> нь хамт нь явж байна. Энэ хэсэгт нэг шахал хийвэл нөөц зам устана.</span>
+          <span>Үлдсэн <strong>{meetingOnly}</strong> нэмэлт холбоос хамгаалж байгаа холбоосоо <strong>зөвхөн зангилаанаар</strong> шүргэлцэнэ — тэдгээрийн хамгаалалт логик, физик биш.</span>
         </div>
         <div className="list" style={{marginTop: 8}}>
           {shared.sort((a, b) => b.parallel_km - a.parallel_km).slice(0, 6).map(item => <button
