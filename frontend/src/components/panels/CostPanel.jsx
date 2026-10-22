@@ -5,19 +5,26 @@ import {post} from '../../api';
 
 // Resilience x cost. Every point on the frontier is a solution the solver
 // actually produced for that budget; nothing here is interpolated.
-export default function CostPanel({data, busy}) {
+export default function CostPanel({data, busy, onHighlight, onSelectEdge, name}) {
   const [budget, setBudget] = useState(4000);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [running, setRunning] = useState(false);
+  const [picked, setPicked] = useState(null);
   const stats = data.topologies.protected?.stats;
   const base = data.optimization?.added_cost_km || 0;
 
   async function solve() {
     setRunning(true); setError('');
     try {
-      const value = await post('/api/network/optimize', {budgets_wkm: [500, 1000, 2000, 3000, 4000, 6000, 8000, 12000]});
+      const custom = Number(budget);
+      const budgets = [500, 1000, 2000, 3000, 4000, 6000, 8000, 12000];
+      if (Number.isFinite(custom) && custom > 0 && !budgets.includes(custom)) budgets.push(custom);
+      budgets.sort((a, b) => a - b);
+      const value = await post('/api/network/optimize', {budgets_wkm: budgets});
       setResult(value);
+      setPicked(null);
+      onHighlight?.([]);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -27,6 +34,11 @@ export default function CostPanel({data, busy}) {
 
   const rows = result?.frontier || [];
   const maxCovered = Math.max(1, ...rows.map(r => r.covered || 0));
+
+  function choose(row) {
+    setPicked(row);
+    onHighlight?.(row.added || []);
+  }
 
   return <>
     <div>
@@ -57,14 +69,38 @@ export default function CostPanel({data, busy}) {
       <div>
         <div className="eyebrow count"><span>Төсөвийн фронт</span><span className="num">{rows.length} цэг</span></div>
         <div className="frontier">
-          {rows.map(row => <div className="frontier-row" key={row.budget_wkm}>
+          {rows.map(row => <button key={row.budget_wkm} className="frontier-row" aria-current={picked?.budget_wkm === row.budget_wkm} onClick={() => choose(row)}>
             <span>{fmt(row.budget_wkm)} w-км төсөв</span>
             <span className="track"><span style={{width: `${(row.covered || 0) / maxCovered * 100}%`}}/></span>
             <em className="num" style={{fontStyle: 'normal', textAlign: 'right'}}>{row.covered}/{row.covered + (row.uncovered?.length || 0)}</em>
-          </div>)}
+          </button>)}
         </div>
-        <p className="prose" style={{marginTop: 6}}>Зүүн талын тоо нь хамгаалагдсан bridge-ийн тоо. Баруун тал нь нийт.</p>
+        <p className="prose" style={{marginTop: 6}}>Зүүн талын тоо нь хамгаалагдсан bridge-ийн тоо. Баруун тал нь нийт. Мөр дээр дарвал тэр төсөвийн шийдийг карт дээр харуулна.</p>
       </div>
+
+      {picked && <div>
+        <div className="eyebrow count"><span>Сонгосон шийд</span><span className="num">{picked.added?.length ?? 0} холбоос</span></div>
+        <dl className="rows m-0">
+          <div className="row"><dt>Төсөв</dt><dd className="num">{fmt(picked.budget_wkm)} w-км</dd></div>
+          <div className="row"><dt>Бодит нэмэлт өртөг</dt><dd className="num">{fmt(picked.added_cost_km, 1)} w-км</dd></div>
+          <div className="row"><dt>Хамгаалагдсан bridge</dt><dd className="num">{picked.covered}</dd></div>
+          <div className="row"><dt>Үлдсэн bridge</dt><dd className={`num ${picked.uncovered?.length ? 'fail' : 'ok'}`}>{picked.uncovered?.length ?? 0}</dd></div>
+          <div className="row"><dt>Бодлогын байдал</dt><dd className="num">{picked.status}</dd></div>
+        </dl>
+        {picked.added?.length > 0 && <div className="list" style={{marginTop: 8}}>
+          {picked.added.map(id => {
+            const route = data.routes.find(r => r.id === id);
+            return <button key={id} className="list-item" onClick={() => onSelectEdge?.(id)}>
+              <i style={{color: 'var(--color-protected)'}}/>
+              <span>{route ? `${name(route.u)} — ${name(route.v)}` : id}</span>
+            </button>;
+          })}
+        </div>}
+        {picked.uncovered?.length > 0 && <p className="prose" style={{marginTop: 8}}>Энэ төсөвөөр {picked.uncovered.length} bridge хамгаалагдахгүй: {picked.uncovered.map(id => {
+          const route = data.routes.find(r => r.id === id);
+          return route ? `${name(route.u)} — ${name(route.v)}` : id;
+        }).join('; ')}.</p>}
+      </div>}
 
       <div>
         <div className="eyebrow count"><span>Бодлогын мэдээлэл</span></div>

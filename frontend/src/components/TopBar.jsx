@@ -11,7 +11,7 @@ function BrandMark() {
   </svg>;
 }
 
-export default function TopBar({topology, setTopology, theme, setTheme, revision, busy, onExport, onMethod}) {
+export default function TopBar({topology, setTopology, theme, setTheme, revision, busy, onExport, onMethod, compact}) {
   return <header className="topbar">
     <div className="brand">
       <BrandMark/>
@@ -21,7 +21,7 @@ export default function TopBar({topology, setTopology, theme, setTheme, revision
       </span>
     </div>
 
-    <div className="mode-switch" role="radiogroup" aria-label="Топологи сонгох">
+    {!compact && <div className="mode-switch" role="radiogroup" aria-label="Топологи сонгох">
       {TOPOLOGIES.map(item => <button
         key={item.key}
         role="radio"
@@ -32,7 +32,7 @@ export default function TopBar({topology, setTopology, theme, setTheme, revision
         <i className="swatch"/>
         <span className="mode-name">{item.short}</span>
       </button>)}
-    </div>
+    </div>}
 
     <div className="topbar-spacer"/>
 
@@ -40,7 +40,7 @@ export default function TopBar({topology, setTopology, theme, setTheme, revision
       <i className="dot"/>{busy ? 'Тооцоо хийгдэж байна…' : `Загвар · rev ${revision}`}
     </span>
     <button className="btn btn-sm btn-ghost" onClick={onMethod}>Аргачлал</button>
-    <button className="btn btn-sm" onClick={onExport}><Download size={13}/>Экспорт</button>
+    <button className="btn btn-sm" onClick={onExport}><Download size={13}/><span>Экспорт</span></button>
     <button
       className="btn btn-sm btn-ghost"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -48,4 +48,20 @@ export default function TopBar({topology, setTopology, theme, setTheme, revision
       {theme === 'dark' ? <Sun size={14}/> : <Moon size={14}/>}
     </button>
   </header>;
+}
+
+// The same control, placed over the plate where a phone has room for it.
+export function ModeSwitch({topology, setTopology, className}) {
+  return <div className={`mode-switch ${className || ''}`} role="radiogroup" aria-label="Топологи сонгох">
+    {TOPOLOGIES.map(item => <button
+      key={item.key}
+      role="radio"
+      aria-checked={topology === item.key}
+      style={{'--mode-color': COLORS[item.key]}}
+      onClick={() => setTopology(item.key)}
+      title={item.hint}>
+      <i className="swatch"/>
+      <span className="mode-name">{item.short}</span>
+    </button>)}
+  </div>;
 }

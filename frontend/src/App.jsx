@@ -4,7 +4,7 @@ import {useAtlas} from './hooks/useAtlas';
 import {useMediaQuery} from './hooks/useMediaQuery';
 import {post} from './api';
 import {TOPOLOGIES, fmt} from './constants';
-import TopBar from './components/TopBar';
+import TopBar, {ModeSwitch} from './components/TopBar';
 import SceneRail from './components/SceneRail';
 import MapPlate from './components/MapPlate';
 import SummaryStrip from './components/SummaryStrip';
@@ -51,6 +51,7 @@ export default function App() {
   }, []);
 
   useEffect(() => { setFactor(data?.cost_factors?.[selected] || 1); }, [selected, data]);
+  useEffect(() => { setHighlight([]); }, [scene]);
 
   useEffect(() => {
     const onKey = event => {
@@ -144,6 +145,7 @@ export default function App() {
       busy={busy}
       onExport={() => window.open(`/api/export/geojson?topology=${topology}`, '_blank')}
       onMethod={() => setScene('method')}
+      compact={isNarrow}
     />
 
     {!data
@@ -187,6 +189,7 @@ export default function App() {
               }}
             />
             <SummaryStrip stats={stats} topology={topology} cities={data.cities.length}/>
+            {isNarrow && <div className="overlay mode-plate"><ModeSwitch topology={topology} setTopology={setTopology}/></div>}
             <LayerControl layers={layers} setLayers={setLayers} basemap={basemap} setBasemap={setBasemap}/>
             <Legend topology={topology} stats={stats} layers={layers} replay={replay} scene={scene}/>
             <FailureTimeline replay={replay} reducedMotion={reducedMotion} onReset={() => setReplay(null)}/>

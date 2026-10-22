@@ -192,6 +192,7 @@ export function useAtlas() {
 
   const changeScene = useCallback(next => {
     setScene(next);
+    setReplay(null);
     if (next === 'method' || next === 'data') setNode('');
   }, []);
 

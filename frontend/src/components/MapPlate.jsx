@@ -62,6 +62,7 @@ export default function MapPlate({
   const userMoved = useRef(false);
   const [scale, setScale] = useState(null);
   const [cursor, setCursor] = useState(null);
+  const [labelZoom, setLabelZoom] = useState(5);
   const soums = useRef({data: null, loading: false, lines: null, labels: null, aimags: null});
   const handlers = useRef({});
   handlers.current = {onPick, onTileFailure, onHover, picking};
@@ -93,6 +94,7 @@ export default function MapPlate({
     const observer = new ResizeObserver(() => { if (!userMoved.current) fit(); else m.invalidateSize(); });
     observer.observe(element.current);
     fit();
+    setLabelZoom(m.getZoom());
     return () => { observer.disconnect(); m.remove(); };
   }, []);
 
@@ -156,7 +158,7 @@ export default function MapPlate({
   useEffect(() => { refreshSoums(); }, [refreshSoums]);
   useEffect(() => {
     const m = map.current; if (!m) return;
-    const onZoom = () => refreshSoums();
+    const onZoom = () => { refreshSoums(); setLabelZoom(m.getZoom()); };
     m.on('zoomend', onZoom);
     return () => { m.off('zoomend', onZoom); };
   }, [refreshSoums]);
@@ -308,6 +310,10 @@ export default function MapPlate({
     markerLayer.current = group;
     markers.current = {};
     const isolated = new Set(replay?.isolated || []);
+    const zoom = m.getZoom();
+    // Zoomed out, twenty-two names overlap into noise. The hub and a few
+    // anchors keep the plate readable until the reader comes closer.
+    const named = zoom >= 5.6 ? null : new Set(['UB', 'Darkhan', 'Erdenet', 'Khovd', 'Choibalsan']);
     data.cities.forEach(c => {
       const isIsolated = isolated.has(c.id);
       const isActive = node?.id === c.id;
@@ -319,11 +325,12 @@ export default function MapPlate({
         className: 'marker-hit',
       }).addTo(group);
       markers.current[c.id] = marker;
+      if (named && !named.has(c.id) && !isActive && !isIsolated) return;
       const dir = LABEL_DIR[c.id] || 'top';
       marker.bindTooltip(text(c.name), {permanent: true, direction: dir, className: 'city-label', offset: dir === 'left' ? [-7, 0] : dir === 'right' ? [7, 0] : [0, dir === 'top' ? -5 : 5]});
       marker.on('click', e => { L.DomEvent.stopPropagation(e); onSelectNode(c); });
     });
-  }, [data, node, replay, theme]);
+  }, [data, node, replay, theme, labelZoom]);
 
   // Hover emphasis without a redraw.
   useEffect(() => {

@@ -5,7 +5,8 @@ import {COLORS, TOPOLOGIES} from '../constants';
 // The legend is written for the current view: it lists only what the plate is
 // actually drawing right now, so it never becomes a second static panel.
 export default function Legend({topology, stats, layers, replay, scene}) {
-  const [open, setOpen] = useState(true);
+  // On a phone the plate is small, so the legend starts folded.
+  const [open, setOpen] = useState(() => !matchMedia('(max-width: 760px)').matches);
   const active = TOPOLOGIES.find(t => t.key === topology);
   const items = [];
 

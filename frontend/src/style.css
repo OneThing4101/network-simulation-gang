@@ -103,7 +103,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .brand-text small { font-size: 10px; color: var(--color-muted); letter-spacing: .04em; }
 .topbar-spacer { flex: 1; }
 
-.mode-switch { display: flex; border: 1px solid var(--color-line-strong); border-radius: var(--radius-md); overflow: hidden; background: var(--color-inset); }
+.mode-switch { display: flex; border: 1px solid var(--color-line-strong); border-radius: var(--radius-md); overflow: hidden; background: var(--color-inset); min-width: 0; }
 .mode-switch button {
   display: flex; align-items: center; gap: 6px; padding: 5px 11px;
   background: transparent; border: 0; border-right: 1px solid var(--color-line);
@@ -368,7 +368,7 @@ input[type="range"].input { padding: 0; border: 0; background: transparent; acce
   background: var(--color-panel); border-top: 1px solid var(--color-line);
   font-size: 11px; color: var(--color-muted);
 }
-.statusbar .grow { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.statusbar .grow { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .statusbar .kbd {
   display: inline-grid; place-items: center; min-width: 15px; height: 15px; padding: 0 3px; margin: 0 1px;
   border: 1px solid var(--color-line-strong); border-radius: 2px; font-size: 9.5px; color: var(--color-slate);
@@ -458,35 +458,54 @@ input[type="range"].input { padding: 0; border: 0; background: transparent; acce
   .rail-item { padding: 11px 3px 9px; }
   .rail-item span { font-size: 9.5px; }
 }
+/* On a phone the mode switch belongs to the plate, not to the narrow top bar. */
+.mode-plate { left: 6px; right: 6px; top: 50px; justify-content: center; }
+.mode-plate .mode-switch { background: color-mix(in srgb, var(--color-panel) 94%, transparent); backdrop-filter: blur(8px); }
+.mode-plate .mode-switch button { padding: 5px 10px; font-size: 11px; }
+
 @media (max-width: 760px) {
   .app { grid-template-rows: 48px 1fr 24px; }
-  .topbar { gap: 9px; padding: 0 9px; }
+  .topbar { gap: 9px; padding: 0 9px; min-width: 0; }
+  .topbar > * { min-width: 0; }
+  .brand { flex-shrink: 1; overflow: hidden; }
   .brand-text small { display: none; }
-  .mode-switch button { padding: 5px 8px; font-size: 11px; }
-  .mode-switch .mode-name { display: none; }
+  .brand-text b { font-size: 11.5px; letter-spacing: .12em; white-space: nowrap; }
   .provenance { display: none; }
   .shell, .shell[data-inspector="open"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr; }
   .rail {
     position: fixed; top: 48px; left: 0; right: 0; bottom: auto; z-index: 650;
     flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--color-line);
+    background: color-mix(in srgb, var(--color-panel) 96%, transparent); backdrop-filter: blur(8px);
   }
-  .rail-item { flex: 0 0 auto; padding: 7px 12px; border-right: 0; border-bottom: 2px solid transparent; }
+  .rail-item { flex: 0 0 auto; padding: 6px 11px; border-right: 0; border-bottom: 2px solid transparent; }
   .rail-item[aria-current="true"] { border-right-color: transparent; border-bottom-color: var(--color-focus); }
   .rail-item span { font-size: 11px; }
-  .stage { grid-column: 1; }
-  .summary-strip { top: 8px; left: 8px; right: 8px; overflow-x: auto; }
-  .summary-strip .metric { padding: 5px 10px; min-width: 66px; }
+  .stage { grid-column: 1; grid-row: 1; }
+  /* The scene rail is a fixed strip, so the plate's own overlays start below it. */
+  .summary-strip { top: 88px; left: 6px; right: 6px; overflow-x: auto; scrollbar-width: none; }
+  .summary-strip::-webkit-scrollbar { display: none; }
+  .summary-strip .metric { padding: 5px 9px; min-width: 62px; }
   .summary-strip .metric b { font-size: 13px; }
-  .layer-pop { top: 52px; right: 8px; left: 8px; width: auto; }
-  .legend { left: 8px; bottom: 8px; max-width: 200px; }
-  .timeline { bottom: 8px; width: calc(100% - 16px); }
-  .zoom-stack { right: 8px; bottom: 46px; }
+  .summary-strip .metric small { font-size: 8.5px; }
+  .layer-pop { top: 96px; right: 6px; left: 6px; width: auto; max-height: 60vh; overflow-y: auto; }
+  .legend { left: 6px; bottom: 6px; max-width: 172px; }
+  .legend-body { padding: 6px 8px; gap: 3px; }
+  .legend-body span { font-size: 10.5px; }
+  .plate-furniture { right: 44px; bottom: 6px; padding: 6px 8px; gap: 5px; }
+  .plate-furniture .readout { display: none; }
+  .timeline { bottom: 6px; width: calc(100% - 12px); padding: 7px 10px 9px; }
+  .stage[data-timeline="on"] .legend { bottom: 126px; }
+  .zoom-stack { right: 6px; bottom: 44px; }
   .inspector { top: 48px; bottom: 0; width: 100%; }
   .statusbar .keys { display: none; }
+  .statusbar { gap: 8px; padding: 0 8px; font-size: 10px; }
 }
 @media (max-width: 420px) {
-  .legend { max-width: 168px; }
+  .legend { max-width: 148px; }
   .timeline-step span { font-size: 9.5px; }
+  .summary-strip .metric { min-width: 56px; padding: 5px 7px; }
+  .topbar .btn span { display: none; }
+  .brand-text b { font-size: 10.5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
