@@ -241,7 +241,11 @@ export default function MapPlate({
       else if (isAdded) { weight = 4.2; }
       else if (isBridge) { weight = 3.2; dash = '9 6'; }
       line.setStyle({color, weight, opacity, dashArray: dash});
-      line.setZIndexOffset(isFocus || isLit || isBad ? 400 : isMarked ? 300 : isAdded ? 120 : 0);
+    });
+    // The emphasised lines are drawn last so they read above the network.
+    [selectedEdge, ...lit, ...failed].forEach(id => {
+      const line = lines.current[id];
+      if (line) line.bringToFront();
     });
   }, [data, topology, selectedEdge, replay, path, layers.bridges, layers.added, theme, highlightIds]);
 
@@ -336,7 +340,7 @@ export default function MapPlate({
     const m = map.current; if (!m || !focus) return;
     const target = focus.kind === 'node'
       ? (data?.cities.find(c => c.id === focus.id) || null)
-      : (geometry[focus.id] ? toLatLng(geometry[focus.id]) : null);
+      : (geometry?.[focus.id] ? toLatLng(geometry[focus.id]) : null);
     if (!target) return;
     if (focus.kind === 'node') m.setView([target.lat, target.lon], Math.max(m.getZoom(), 6), {animate: true});
     else m.fitBounds(L.latLngBounds(target).pad(0.35), {maxZoom: 8, animate: true});

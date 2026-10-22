@@ -115,7 +115,7 @@ export default function App() {
   }, [busy, replay, data, stats]);
 
   const inspectorProps = {
-    data, topology, edge, edges, selected, setSelected: selectEdge, node, setNode, stats,
+    data, topology, edge, edges, selected, setSelected: selectEdge, onSelectEdge: selectEdge, node, setNode, stats,
     chosen: !!edge, name, busy, factor, setFactor, onFactorSave, onExclude,
     onFocus: setFocus, onEdit: city => setModal({type: 'edit', ...city}),
     onAddNode: () => setModal({type: 'new'}),
@@ -160,7 +160,7 @@ export default function App() {
         ? <MethodScene data={data}/>
         : <div className="shell" data-inspector={inspectorOpen ? 'open' : 'closed'}>
           <SceneRail scene={scene} setScene={setScene}/>
-          <div className="stage">
+          <div className="stage" data-timeline={replay ? 'on' : 'off'}>
             <MapPlate
               data={data}
               geography={geography}

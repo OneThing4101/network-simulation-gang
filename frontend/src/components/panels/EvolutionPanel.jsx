@@ -53,7 +53,7 @@ export default function EvolutionPanel({evolution, stage, setStage, selected, se
     {bridge && <div>
       <div className="eyebrow count"><span>Сонгосон bridge</span><Split size={12}/></div>
       <h3 className="title" style={{fontSize: 13}}>{name(bridge.u)} — {name(bridge.v)}</h3>
-      <p className="prose" style={{marginTop: 4}}>Тасрахад мод хоёр хэсэгт хуваагдана: {bridge.partition.map((part, index) => `${part.length} хот`).join(' болон ')}.</p>
+      <p className="prose" style={{marginTop: 4}}>Тасрахад мод хоёр хэсэгт хуваагдана: {bridge.partition.map(part => `${part.length} хот`).join(' ба ')}.</p>
       <p className="prose">Хамгаалсан хувилбарт энэ холбоосыг хамгаалагч цагираг: {evolution.coverage[bridge.edge_id]?.length ? evolution.coverage[bridge.edge_id].map(id => name(id.split('--')[0]) + '–' + name(id.split('--')[1])).join(', ') : 'байхгүй'}.</p>
     </div>}
 

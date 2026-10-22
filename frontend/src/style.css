@@ -193,7 +193,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .zoom-stack button:last-child { border-bottom: 0; }
 .zoom-stack button:hover { background: var(--color-mist); }
 
-.legend { left: 12px; bottom: 12px; max-width: 280px; }
+.legend { left: 12px; bottom: 12px; max-width: 280px; transition: bottom .25s ease; }
+.stage[data-timeline="on"] .legend { bottom: 138px; }
 .legend-head {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   padding: 6px 10px; font-size: 9.5px; text-transform: uppercase; letter-spacing: .12em; color: var(--color-muted);
