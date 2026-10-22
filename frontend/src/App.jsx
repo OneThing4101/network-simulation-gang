@@ -23,7 +23,7 @@ export default function App() {
     scene, setScene, topology, setTopology, selected, setSelected, node, setNode,
     hover, setHover, replay, setReplay, corridor, evolution,
     layers, setLayers, basemap, setBasemap, theme, setTheme,
-    source, setSource, target, setTarget, notify, reload, load, perform, mutate, runReplay,
+    source, setSource, target, setTarget, notify, load, perform, mutate, runReplay,
     name, edge, stats, edges,
   } = atlas;
 
@@ -188,7 +188,7 @@ export default function App() {
                 notify('Онлайн tile холбогдсонгүй. Офлайн рельефээр үргэлжилнэ.', 'fail');
               }}
             />
-            <SummaryStrip stats={stats} topology={topology} cities={data.cities.length}/>
+            <SummaryStrip stats={stats} cities={data.cities.length}/>
             {isNarrow && <div className="overlay mode-plate"><ModeSwitch topology={topology} setTopology={setTopology}/></div>}
             <LayerControl layers={layers} setLayers={setLayers} basemap={basemap} setBasemap={setBasemap}/>
             <Legend topology={topology} stats={stats} layers={layers} replay={replay} scene={scene}/>
@@ -218,7 +218,7 @@ export default function App() {
         modal.type === 'new' ? `${values.name} нэмэгдлээ` : `${values.name} шинэчлэгдлээ`))}
       onPickOnMap={values => { setPicking({...modal, ...values}); setModal(null); }}
       onDelete={() => perform('Зангилаа хасаж байна', () => mutate(`/api/nodes/${modal.id}`, {}, 'DELETE', `${modal.name} хасагдлаа`))}
-      onReset={() => perform('Суурь төлөв сэргээж байна', () => mutate('/api/network/reset', {}, 'POST', 'Суурь 22 хотын төлөв сэргэлээ'))}
+      onReset={() => perform('Суурь төлөв сэргээж байна', () => mutate('/api/network/reset', {}, 'POST', 'Суурь 22 хотын төлөв сэргээлээ'))}
     />}
     <Toasts items={toasts}/>
   </div>;

@@ -1,11 +1,11 @@
 import {useEffect, useRef, useState} from 'react';
-import {Layers, Map as MapIcon, X} from 'lucide-react';
+import {Layers, X} from 'lucide-react';
 import {LAYER_GROUPS, LAYER_PRESETS} from '../constants';
 import {BASEMAPS} from './MapPlate';
 
 // One discoverable control instead of nine equal buttons. Layers are grouped
 // by what they are for, and a preset sets the whole plate in one click.
-export default function LayerControl({layers, setLayers, basemap, setBasemap, onTileFailure}) {
+export default function LayerControl({layers, setLayers, basemap, setBasemap}) {
   const [open, setOpen] = useState(false);
   const root = useRef(null);
 

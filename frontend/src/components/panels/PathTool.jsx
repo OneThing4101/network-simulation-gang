@@ -5,7 +5,7 @@ import {post} from '../../api';
 
 // The shortest path between two cities, computed on the live graph. When a
 // failure is active the path avoids the failed cables.
-export default function PathTool({data, topology, source, setSource, target, setTarget, replay, name, onFocus, onHighlight}) {
+export default function PathTool({data, topology, source, setSource, target, setTarget, replay, name, onHighlight}) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [running, setRunning] = useState(false);

@@ -76,14 +76,14 @@ def _satisfies_one(version, part):
         base = part[1:].strip()
         major, minor, patch = _version(base)[0]
         if major > 0:
-            return _within(version, base, f'{major + 1}.0.0')
+            return _cmp(version, base) >= 0 and _cmp(version, f'{major + 1}.0.0') < 0
         if minor > 0:
-            return _within(version, base, f'0.{minor + 1}.0')
-        return _within(version, base, f'0.0.{patch + 1}')
+            return _cmp(version, base) >= 0 and _cmp(version, f'0.{minor + 1}.0') < 0
+        return _cmp(version, base) >= 0 and _cmp(version, f'0.0.{patch + 1}') < 0
     if part.startswith('~'):
         base = part[1:].strip()
         major, minor, _ = _version(base)[0]
-        return _within(version, base, f'{major}.{minor + 1}.0')
+        return _cmp(version, base) >= 0 and _cmp(version, f'{major}.{minor + 1}.0') < 0
     for operator in ('>=', '<=', '>', '<', '='):
         if part.startswith(operator):
             target = part[len(operator):].strip()
@@ -103,8 +103,30 @@ def _satisfies_one(version, part):
     return True
 
 
+def body_version(body):
+    """The version the tarball itself declares, or None if it cannot be read."""
+    try:
+        with tarfile.open(body, 'r:gz') as archive:
+            for member in archive.getmembers():
+                parts = Path(member.name).parts
+                if len(parts) == 2 and parts[0] == 'package' and parts[1] == 'package.json':
+                    handle = archive.extractfile(member)
+                    if handle is None:
+                        return None
+                    return json.loads(handle.read().decode('utf-8')).get('version')
+    except (tarfile.TarError, OSError, ValueError):
+        return None
+    return None
+
+
 def scan_cache():
-    """Map (package name, version) to the cached tarball body path."""
+    """Map (package name, version) to the cached tarball body path.
+
+    A cache entry can point at the body of a different release, so every
+    tarball is checked against the version inside its own manifest before it
+    is offered. A mismatched body would otherwise install a package whose
+    code does not match its version number.
+    """
     index = CACHE / 'index-v5'
     if not index.exists():
         return {}
@@ -135,39 +157,59 @@ def scan_cache():
                     continue
                 digest = base64.b64decode(integrity[7:]).hex()
                 body = CACHE / 'content-v2' / 'sha512' / digest[:2] / digest[2:4] / digest[4:]
-                if body.exists():
-                    found[(name, version)] = body
+                if not body.exists():
+                    continue
+                if body_version(body) != version:
+                    continue
+                found[(name, version)] = body
     return found
 
 
-def pick(available, name, spec):
+def pick(available, name, specs):
+    """Highest cached version that satisfies every range asked for so far."""
     versions = sorted((v for (n, v) in available if n == name), key=lambda v: _version(v)[0])
     for version in reversed(versions):
-        if satisfies(version, spec):
+        if all(satisfies(version, spec) for spec in specs):
+            return version
+    for version in reversed(versions):
+        if any(satisfies(version, spec) for spec in specs):
             return version
     return None
 
 
 def install(target: Path, available, wanted, report):
-    """Install wanted packages (name -> range) into target/node_modules."""
+    """Install wanted packages (name -> range) into target/node_modules.
+
+    node_modules is flat, so a package may only be present at one version.
+    The ranges are collected first and the highest cached version that fits
+    them all is installed once, instead of letting a later request overwrite
+    an earlier one and leave a mixed directory behind.
+    """
     root = target / 'node_modules'
     root.mkdir(parents=True, exist_ok=True)
     queue = [(name, spec) for name, spec in wanted.items()]
-    installed, failed, seen = {}, [], set()
+    ranges = {}
+    chosen = {}
+    failed = []
+    processed = set()
 
     while queue:
         name, spec = queue.pop(0)
-        if (name, spec) in seen:
+        if name in processed and spec in ranges.get(name, ()):
             continue
-        seen.add((name, spec))
-        version = pick(available, name, spec)
+        ranges.setdefault(name, [])
+        if spec not in ranges[name]:
+            ranges[name].append(spec)
+        version = pick(available, name, ranges[name])
         if version is None:
             failed.append((name, spec, 'no cached version'))
+            processed.add(name)
             continue
+        if chosen.get(name) == version:
+            continue
+        chosen[name] = version
         body = available[(name, version)]
         destination = root / name
-        if (name, version) in installed:
-            continue
         if destination.exists():
             shutil.rmtree(destination)
         destination.parent.mkdir(parents=True, exist_ok=True)
@@ -180,7 +222,6 @@ def install(target: Path, available, wanted, report):
                 if member.name in ('', '.'):
                     continue
                 archive.extract(member, destination)
-        installed[(name, version)] = destination
         report.append(f'  + {name}@{version}')
 
         meta_path = destination / 'package.json'
@@ -188,15 +229,11 @@ def install(target: Path, available, wanted, report):
             continue
         meta = json.loads(meta_path.read_text())
         for dependency, range_spec in (meta.get('dependencies') or {}).items():
-            if dependency in installed or (destination / '..' / dependency).exists():
-                continue
             queue.append((dependency, range_spec))
         for dependency, range_spec in (meta.get('optionalDependencies') or {}).items():
-            if dependency in installed:
-                continue
             queue.append((dependency, range_spec))
     link_bins(root)
-    return installed, failed
+    return chosen, failed
 
 
 def link_bins(root: Path):

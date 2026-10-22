@@ -12,6 +12,8 @@ compared against every other route.  The result is a common-risk indicator for
 engineering review.  It is a model, not a right-of-way survey and not a
 natural-hazard forecast.
 """
+from __future__ import annotations
+
 import numpy as np
 import networkx as nx
 import shapely

@@ -39,7 +39,7 @@ export default function TopologyPanel({data, topology, edge, edges, selected, no
       <label className="field">
         <select className="input" value={chosen ? selected : ''} onChange={e => onSelectEdge(e.target.value)} aria-label="Кабель сонгох">
           <option value="" disabled>Кабель сонгоно уу</option>
-          {edges.map(r => <option key={r.id} value={r.id}>{name(r.u)} — {name(r.v)}</option>)}
+          {edges.map(r => <option key={r.id} value={r.id}>{name(r.u)} — {name(r.v)}{stats?.bridges?.includes(r.id) ? ' · bridge' : ''}</option>)}
         </select>
       </label>
     </div>

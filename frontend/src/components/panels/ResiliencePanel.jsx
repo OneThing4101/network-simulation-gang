@@ -13,7 +13,7 @@ const SCOPES = [
 // Failure lab: cut a cable, read the consequence, then look for the trap that
 // logical redundancy cannot cover.
 export default function ResiliencePanel({
-  data, topology, edge, edges, selected, chosen, busy, scope, setScope,
+  data, topology, edges, selected, chosen, busy, scope, setScope,
   replay, onRun, onClear, name, onSelectEdge, onFocus, corridor,
   source, setSource, target, setTarget, onHighlight,
 }) {
@@ -58,7 +58,7 @@ export default function ResiliencePanel({
     </div>
 
     <button className="btn btn-danger btn-block" disabled={!chosen || !!busy} onClick={onRun}>
-      <Zap size={15}/>Кабель тасаж турших
+      <Zap size={15}/>Кабель тасалж турших
     </button>
 
     {replay && <div className="callout callout-plain" role="status">
@@ -125,7 +125,7 @@ export default function ResiliencePanel({
 
     <div>
       <div className="eyebrow">Бүх кабелийн гэмтлийг шалгах</div>
-      <p className="prose" style={{marginBottom: 8}}>Гурван топологийн кабель бүрийг нэг нэгээр тасаж, холбоотой үлдсэн тоог гаргана.</p>
+      <p className="prose" style={{marginBottom: 8}}>Гурван топологийн кабель бүрийг нэг нэгээр тасалж, холбоотой үлдсэн тоог гаргана.</p>
       {audit ? <div className="list">
         {Object.entries(audit).map(([key, value]) => {
           if (!value) return <div className="list-item" key={key}><span>{key}</span><em>боломжгүй</em></div>;

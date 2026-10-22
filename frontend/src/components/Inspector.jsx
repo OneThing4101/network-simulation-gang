@@ -1,4 +1,4 @@
-import {ChevronRight, X} from 'lucide-react';
+import {X} from 'lucide-react';
 import TopologyPanel from './panels/TopologyPanel';
 import EvolutionPanel from './panels/EvolutionPanel';
 import ResiliencePanel from './panels/ResiliencePanel';

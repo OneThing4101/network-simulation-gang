@@ -78,7 +78,7 @@ export function useAtlas() {
   const load = useCallback(async () => {
     setLoadError('');
     try {
-      const [value, geo] = await Promise.all([reload(), get('/api/geography').then(setGeography)]);
+      const [value] = await Promise.all([reload(), get('/api/geography').then(setGeography)]);
       return value;
     } catch (e) {
       setLoadError(e.message);

@@ -2,7 +2,7 @@ import {fmt} from '../constants';
 
 // The headline numbers, compressed to one strip over the map. Details stay in
 // the inspector; the strip answers "what am I looking at" without scrolling.
-export default function SummaryStrip({stats, topology, cities, onShowWorstPair}) {
+export default function SummaryStrip({stats, cities}) {
   if (!stats) {
     return <div className="overlay overlay-panel summary-strip">
       <div className="metric"><small>Топологи</small><b>—</b></div>

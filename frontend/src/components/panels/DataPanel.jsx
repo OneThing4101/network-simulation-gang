@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Database, Download, Plus, RotateCcw, Search, Undo2} from 'lucide-react';
+import {Download, Plus, Search, Undo2} from 'lucide-react';
 import {fmt} from '../../constants';
 
 const EXPORTS = [
@@ -10,7 +10,7 @@ const EXPORTS = [
 
 // Data and evidence: what the model is made of, what can be changed, and how
 // to take a result away with you.
-export default function DataPanel({data, topology, busy, onAddNode, onEditNode, onReset, onToggleRoute, name, notify}) {
+export default function DataPanel({data, topology, busy, onAddNode, onEditNode, onReset, onToggleRoute, name}) {
   const [query, setQuery] = useState('');
   const excluded = new Set(data.excluded || []);
   const routes = data.routes.filter(r => `${name(r.u)} ${name(r.v)} ${r.id}`.toLowerCase().includes(query.toLowerCase()));

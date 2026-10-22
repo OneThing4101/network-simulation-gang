@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {AlertTriangle, Calculator, Check, Coins} from 'lucide-react';
+import {AlertTriangle, Calculator, Check} from 'lucide-react';
 import {fmt} from '../../constants';
 import {post} from '../../api';
 

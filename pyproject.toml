@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fiber-atlas"
+version = "2.0.0"
+description = "Fiber Atlas — Mongolia's national fibre backbone resilience studio"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "Academic coursework"}
+dependencies = [
+  "Flask==3.1.3",
+  "networkx==3.7",
+  "numpy==2.5.3",
+  "scipy==1.18.1",
+  "shapely>=2.1,<3",
+  "pyproj>=3.7,<4",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10"]
+
+[tool.setuptools]
+packages = ["fiberlab"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
