@@ -511,7 +511,9 @@ Full mesh     231   214,427     240,893       0    21.8 мс  Өлгий—Чо�
   cd frontend && npm ci
   npm run dev        # http://127.0.0.1:5173, /api → :5080 proxy
                      # (backend заавал тусад нь ажиллаж байх ёстой;
-                     #  үгүй бол "ECONNREFUSED 127.0.0.1:5080" алдаа гарна)
+                     #  үгүй бол "ECONNREFUSED 127.0.0.1:5080" алдаа гарна.
+                     #  Proxy нь Origin толгойг :5080 болгож илгээдэг —
+                     #  үгүй бол backend POST хүсэлтийг 403-оор татгалзана)
   npm run build      # dist/ шинэчилнэ, :5080 үүнийг serve хийнэ
 
   Тест:  .venv/bin/python -m pytest -q tests
