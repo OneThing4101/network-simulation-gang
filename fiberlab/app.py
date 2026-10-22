@@ -1,5 +1,6 @@
 """Local Flask API and built React UI. No cloud account or runtime data fetch."""
 import csv
+import gzip
 import io
 import json
 import os
@@ -13,6 +14,8 @@ from flask import Flask, jsonify, request, send_from_directory, Response
 from werkzeug.exceptions import HTTPException
 from .terrain import ROOT, TerrainRouter
 from .engine import NetworkModel, statistics
+from . import evolution as evolution_module
+from . import scenario as scenario_module
 
 
 def default_cities():
@@ -29,6 +32,7 @@ class Store:
         self.busy = False
         self.revision = 0
         self.audit_cache = None
+        self.corridor_cache = None
         cache_path = ROOT / 'data/routes.cache.json'
         cache = json.loads(cache_path.read_text()) if cache_path.exists() else None
         cities = default_cities()
@@ -52,6 +56,7 @@ class Store:
 
     def save(self):
         self.audit_cache = None
+        self.corridor_cache = None
         self.revision += 1
         if self.persist:
             directory = ROOT / '.state'
@@ -66,6 +71,14 @@ class Store:
     def require_idle(self):
         if self.busy:
             raise ValueError('Маршрут шинэчилж байна. Дууссаны дараа дахин оролдоно уу.')
+
+    def corridor_analyzer(self):
+        """Built on demand: the projected geometry is only needed by the
+        shared-risk scenes, and it must be rebuilt when the graph changes."""
+        if self.corridor_cache is None:
+            from .corridor import CorridorAnalyzer
+            self.corridor_cache = CorridorAnalyzer(list(self.model.routes.values()))
+        return self.corridor_cache
 
     def rebuild(self, cities):
         self.require_idle()
@@ -100,6 +113,19 @@ def create_app(persist=True):
     store = Store(persist=persist)
     app.extensions['network_store'] = store
 
+    @app.after_request
+    def compress(response):
+        # Route geometry is the bulk of the payload; gzip keeps the map snappy
+        # on a local network without dropping any vertex.
+        if (response.status_code == 200 and response.mimetype in ('application/json', 'application/geo+json')
+                and 'gzip' in (request.headers.get('Accept-Encoding') or '')):
+            data = response.get_data()
+            if len(data) > 4096:
+                response.set_data(gzip.compress(data, 6))
+                response.headers['Content-Encoding'] = 'gzip'
+                response.headers['Content-Length'] = str(len(response.get_data()))
+        return response
+
     @app.before_request
     def validate_origin():
         # UI/API run on one origin; a foreign webpage cannot mutate localhost.
@@ -117,6 +143,13 @@ def create_app(persist=True):
     @app.errorhandler(HTTPException)
     def http_error(error):
         return jsonify(error=error.description), error.code
+
+    @app.errorhandler(Exception)
+    def unexpected(error):
+        # A solver or geometry failure must not leak a stack trace or a local path.
+        app.logger.exception('Unhandled API error')
+        return jsonify(error='Серверийн дотоод алдаа гарлаа. Үйлдлийг давтан хийж үзнэ үү.',
+                       detail=type(error).__name__), 500
 
     def body():
         data = request.get_json()
@@ -146,6 +179,76 @@ def create_app(persist=True):
             return jsonify(**store.model.payload(), revision=store.revision, busy=store.busy,
                            preprocessing=store.preprocessing)
 
+    @app.get('/api/network/geometry')
+    def geometry():
+        # Vertex lists are fetched per topology: the map never needs all 231 at once.
+        topology = request.args.get('topology', 'protected')
+        with store.lock:
+            return jsonify(topology=topology, geometry=store.model.geometry(topology),
+                           revision=store.revision)
+
+    @app.get('/api/network/evolution')
+    def evolution():
+        with store.lock:
+            return jsonify(**evolution_module.evolution(store.model), revision=store.revision)
+
+    @app.get('/api/network/corridors')
+    def corridors():
+        from .corridor import CorridorAnalyzer
+        topology = request.args.get('topology', 'protected')
+        buffer_km = float(request.args.get('buffer_km', 5))
+        if not 0.1 <= buffer_km <= 100:
+            raise ValueError('Зурвасын өргөн 0.1–100 км байна.')
+        with store.lock:
+            analyzer = store.corridor_analyzer()
+            edge_ids = store.model.graphs[topology].edges if store.model.graphs.get(topology) else []
+            ids = [d['id'] for _, _, d in store.model.graphs[topology].edges(data=True)] if store.model.graphs.get(topology) else []
+            pairs = analyzer.overlaps(ids)
+            groups = analyzer.groups(ids)
+            return jsonify(topology=topology, buffer_km=buffer_km, pairs=pairs, groups=groups,
+                           policy=analyzer.policy, summary=analyzer.summary(ids), revision=store.revision)
+
+    @app.post('/api/network/impact')
+    def impact():
+        from .corridor import CorridorAnalyzer
+        data = body()
+        topology = data.get('topology', 'protected')
+        radius_km = float(data.get('radius_km', 25))
+        buffer_km = float(data.get('buffer_km', 5))
+        if not 1 <= radius_km <= 500:
+            raise ValueError('Нөлөөллийн радиус 1–500 км байна.')
+        with store.lock:
+            analyzer = store.corridor_analyzer()
+            ids = [d['id'] for _, _, d in store.model.graphs[topology].edges(data=True)] if store.model.graphs.get(topology) else []
+            result = analyzer.impact(float(data.get('lat', 47.9)), float(data.get('lon', 106.9)),
+                                     radius_km, ids, buffer_km)
+            failed = result['direct'] + result['correlated']
+            after = None
+            if failed:
+                after = scenario_module.analyse(store.model, topology, failed[0], 'cable')
+                after = None
+            return jsonify(**result, topology=topology, after=after, revision=store.revision)
+
+    @app.post('/api/network/optimize')
+    def optimize():
+        from . import optimize as optimize_module
+        data = body()
+        budget = data.get('budget_wkm')
+        budgets = data.get('budgets_wkm')
+        if budgets is None:
+            if budget is None:
+                raise ValueError('Төсөв (weighted-км) шаардлагатай.')
+            budgets = [float(budget)]
+        if not isinstance(budgets, list) or not budgets:
+            raise ValueError('Төсөвийн жагсаалт шаардлагатай.')
+        budgets = [float(b) for b in budgets]
+        if any(b < 0 for b in budgets):
+            raise ValueError('Төсөв сөрөг байж болохгүй.')
+        with store.lock:
+            model = store.model
+            frontier = optimize_module.budget_frontier(model.full, model.mst, budgets)
+            return jsonify(frontier=frontier, topology='protected', revision=store.revision)
+
     @app.get('/api/geography')
     def geography():
         # Layer export does not need the routing grid constructed at warm start.
@@ -164,6 +267,16 @@ def create_app(persist=True):
     def simulate_cut():
         data = body()
         return jsonify(store.model.cut(data.get('topology', 'protected'), data.get('edge_id'), data.get('scope', 'cable')))
+
+    @app.post('/api/network/failure-replay')
+    def failure_replay():
+        data = body()
+        with store.lock:
+            topology = data.get('topology', 'protected')
+            scope = data.get('scope', 'cable')
+            corridor = store.corridor_analyzer() if scope == 'shared_risk' else None
+            result = scenario_module.replay(store.model, topology, data.get('edge_id'), scope, corridor)
+            return jsonify(**result, revision=store.revision)
 
     @app.post('/api/network/path')
     def path():
