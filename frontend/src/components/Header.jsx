@@ -4,7 +4,7 @@ export const TABS = [['design', 'Төлөвлөлт'], ['failure', 'Тасрал
 
 export default function Header({tab, setTab, busy, topology, onTour, tourOpen, theme, setTheme}) {
   return <header className="topbar">
-    <a className="brand" href="/"><span className="brand-mark"><Network size={17}/></span><span>Fiber Atlas<small>Монголын шилэн кабелийн сүлжээ</small></span></a>
+    <a className="brand" href="/"><span className="brand-mark"><Network size={17}/></span><span>Network Simulation Gang<small>Монголын шилэн кабелийн сүлжээ</small></span></a>
     <nav className="tabs" role="tablist" aria-label="Үндсэн цэс">{TABS.map(([k, label]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}>{label}</button>)}</nav>
     <span className={`status-dot ${busy ? 'busy' : ''}`} role="status"><i/>{busy ? `${busy}…` : 'Локал сервер'}</span>
     <div className="topbar-actions flex items-center gap-2">

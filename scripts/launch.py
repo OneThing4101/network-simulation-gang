@@ -41,7 +41,7 @@ if args.stop:
             if not ready():
                 break
             time.sleep(.1)
-        print('Fiber Atlas сервер зогслоо.')
+        print('Network Simulation Gang сервер зогслоо.')
     else:
         print('Сервер аль хэдийн зогссон байна.')
     sys.exit(0)
@@ -61,7 +61,7 @@ if not ready():
     else:
         sys.exit(f'Сервер бэлтгэгдэж байна. Лог: {runtime / "server.log"}')
 
-print(f'Fiber Atlas ажиллаж байна: {url}')
+print(f'Network Simulation Gang ажиллаж байна: {url}')
 if not args.no_browser:
     subprocess.Popen(['xdg-open', url], stdin=subprocess.DEVNULL,
                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
