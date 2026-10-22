@@ -1,11 +1,11 @@
 {
-  "/api/health": 51.907608001783956,
-  "/api/network/topologies": 67.06408699392341,
-  "/api/geography": 30.975817004218698,
-  "/api/network/audit": 78.59150500007672,
-  "/api/export/geojson": 1.8067720011458732,
-  "/api/export/csv": 0.40125100349541754,
-  "/api/export/json": 56.47174500336405,
-  "/api/network/simulate-cut": 1.2655579994316213,
-  "/api/network/path": 0.5001120007364079
+  "/api/health": 1.1906389991054311,
+  "/api/network/topologies": 5.136621002748143,
+  "/api/geography": 0.43581499630818143,
+  "/api/network/audit": 72.76884200109635,
+  "/api/export/geojson": 1.653949002502486,
+  "/api/export/csv": 0.3467660062597133,
+  "/api/export/json": 2.338005004276056,
+  "/api/network/simulate-cut": 1.0584940027911216,
+  "/api/network/path": 0.381460995413363
 }

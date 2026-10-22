@@ -1,0 +1,88 @@
+import {useState} from 'react';
+import {AlertTriangle, Calculator, Check, Coins} from 'lucide-react';
+import {fmt} from '../../constants';
+import {post} from '../../api';
+
+// Resilience x cost. Every point on the frontier is a solution the solver
+// actually produced for that budget; nothing here is interpolated.
+export default function CostPanel({data, busy}) {
+  const [budget, setBudget] = useState(4000);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState('');
+  const [running, setRunning] = useState(false);
+  const stats = data.topologies.protected?.stats;
+  const base = data.optimization?.added_cost_km || 0;
+
+  async function solve() {
+    setRunning(true); setError('');
+    try {
+      const value = await post('/api/network/optimize', {budgets_wkm: [500, 1000, 2000, 3000, 4000, 6000, 8000, 12000]});
+      setResult(value);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  const rows = result?.frontier || [];
+  const maxCovered = Math.max(1, ...rows.map(r => r.covered || 0));
+
+  return <>
+    <div>
+      <div className="eyebrow">Сүлжээний өртгийн бүрэлдэхүүн</div>
+      <dl className="rows m-0">
+        <div className="row"><dt>MST-ийн өртөг</dt><dd className="num">{fmt(data.topologies.mst?.stats?.cost_km)} w-км</dd></div>
+        <div className="row"><dt>Бүрэн хамгаалалтын өртөг</dt><dd className="num">{fmt(base)} w-км</dd></div>
+        <div className="row"><dt>Нэмэлт урт</dt><dd className="num">{stats ? `${fmt(stats.overhead_pct, 1)}%` : '—'}</dd></div>
+      </dl>
+      <p className="prose" style={{marginTop: 8}}>Задалбарт «15–20% нэмэлт кабель» гэж зөвшөөрөгдсөн боловч энэ өгөгдлөөр бодит нэмэлт урт <strong>{stats ? fmt(stats.overhead_pct, 1) : '—'}%</strong> байна. 15–20% нь заавал биелэхгүй.</p>
+    </div>
+
+    <div>
+      <div className="eyebrow">Төсөвийн шийд</div>
+      <label className="field">
+        <span>Нэмэлт төсөв (weighted-км)</span>
+        <input className="input num" type="number" min="0" step="500" value={budget} onChange={e => setBudget(e.target.value)}/>
+      </label>
+      <button className="btn btn-block" style={{marginTop: 8}} disabled={running || !!busy} onClick={solve}>
+        <Calculator size={15}/>{running ? 'Бодож байна…' : 'Төсөвийн хязгаар бодох'}
+      </button>
+      <p className="prose" style={{marginTop: 6}}>Задалбар бүрийн хувьд хамгийн их bridge-ийг хамгаалах нэмэлт холбоосын багцыг HiGHS бодно.</p>
+    </div>
+
+    {error && <div className="error-banner" role="alert"><AlertTriangle size={15}/><span>{error}</span></div>}
+
+    {rows.length > 0 && <>
+      <div>
+        <div className="eyebrow count"><span>Төсөвийн фронт</span><span className="num">{rows.length} цэг</span></div>
+        <div className="frontier">
+          {rows.map(row => <div className="frontier-row" key={row.budget_wkm}>
+            <span>{fmt(row.budget_wkm)} w-км төсөв</span>
+            <span className="track"><span style={{width: `${(row.covered || 0) / maxCovered * 100}%`}}/></span>
+            <em className="num" style={{fontStyle: 'normal', textAlign: 'right'}}>{row.covered}/{row.covered + (row.uncovered?.length || 0)}</em>
+          </div>)}
+        </div>
+        <p className="prose" style={{marginTop: 6}}>Зүүн талын тоо нь хамгаалагдсан bridge-ийн тоо. Баруун тал нь нийт.</p>
+      </div>
+
+      <div>
+        <div className="eyebrow count"><span>Бодлогын мэдээлэл</span></div>
+        <dl className="rows m-0">
+          <div className="row"><dt>Байдал</dt><dd className={`num ${rows.every(r => r.status === 'optimal') ? 'ok' : 'amber'}`}>{rows[0].status}</dd></div>
+          <div className="row"><dt>Хамрах хүрээ</dt><dd className="num">Тогтсон MST</dd></div>
+          {rows[0].gap != null && <div className="row"><dt>Gap</dt><dd className="num">{fmt(rows[0].gap * 100, 4)}%</dd></div>}
+        </dl>
+      </div>
+
+      {rows.some(r => r.status === 'infeasible') && <div className="callout callout-amber">
+        <AlertTriangle size={15}/><span>Зарим төсөвөөр бүх bridge-ийг хамгаалах боломжгүй. Энэ нь шууд «учир байхгүй» гэсэн үг — хариу нь төсөвийн хязгаарт хүрэлцэхгүй байна гэсэн үг.</span>
+      </div>}
+
+      {rows.filter(r => r.covered > 0).length > 0 && <div>
+        <div className="eyebrow count"><span>Хамгийн их хамрах багц</span><Check size={12}/></div>
+        <p className="prose">Хамгийн өндөр төсөвт: {fmt(Math.max(...rows.map(r => r.covered || 0)))}/{stats?.bridge_count ?? '—'} bridge хамгаалагдлаа, нэмэлт өртөг {fmt(Math.min(...rows.filter(r => r.covered > 0).map(r => r.added_cost_km || 0)))} w-км.</p>
+      </div>}
+    </>}
+  </>;
+}

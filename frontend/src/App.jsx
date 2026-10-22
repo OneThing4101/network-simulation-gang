@@ -1,163 +1,222 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { LoaderCircle, Mountain, Waves, Trees, Route, Map, GitBranch, AlertTriangle, X, RotateCcw, Link2, Grid2x2, Radio } from 'lucide-react';
-import { api } from './api';
-import { COLORS, TOPOLOGIES, fmt } from './constants';
-import Header from './components/Header';
-import GeoMap, { BASEMAPS } from './components/GeoMap';
-import TopologyRail from './components/TopologyRail';
-import CableInspector from './components/CableInspector';
-import FailureLab from './components/FailureLab';
-import DataPanel from './components/DataPanel';
-import Method from './components/Method';
+import {useCallback, useEffect, useMemo, useState} from 'react';
+import {AlertTriangle, LoaderCircle, PanelRightClose, PanelRightOpen, RotateCcw} from 'lucide-react';
+import {useAtlas} from './hooks/useAtlas';
+import {useMediaQuery} from './hooks/useMediaQuery';
+import {post} from './api';
+import {TOPOLOGIES, fmt} from './constants';
+import TopBar from './components/TopBar';
+import SceneRail from './components/SceneRail';
+import MapPlate from './components/MapPlate';
+import SummaryStrip from './components/SummaryStrip';
+import LayerControl from './components/LayerControl';
+import Legend from './components/Legend';
+import FailureTimeline from './components/FailureTimeline';
+import Inspector from './components/Inspector';
+import MethodScene from './components/MethodScene';
 import NodeModal from './components/NodeModal';
-import Tour, { TOUR_STEPS } from './components/Tour';
 import Toasts from './components/Toasts';
 
-const LAYER_TOGGLES = [['mountain', 'Уул', Mountain], ['lake', 'Нуур', Waves], ['river', 'Гол', Waves], ['forest', 'Ой', Trees], ['access', 'Нэвтрэх хэсэг', Route], ['bridges', 'Bridge', GitBranch], ['added', 'Нэмэлт холбоос', Link2], ['soums', 'Сум', Grid2x2], ['flow', 'Урсгал', Radio]];
-const TAB_KEYS = ['design', 'failure', 'manage', 'method'];
-
-// Tab, topology and selected cable live in the URL hash so a view can be reloaded or shared during the presentation.
-function readHash() {
-  const p = new URLSearchParams(location.hash.slice(1));
-  return {tab: TAB_KEYS.includes(p.get('tab')) ? p.get('tab') : 'design', topology: TOPOLOGIES.some(t => t.key === p.get('topo')) ? p.get('topo') : 'protected', selected: p.get('edge') || 'Murun--Uliastai'};
-}
-function initialTheme() {
-  try { const saved = localStorage.getItem('fiber-theme'); if (saved === 'dark' || saved === 'light') return saved; } catch {}
-  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
 export default function App() {
-  const start = useRef(readHash()).current;
-  const [data, setData] = useState(null), [geo, setGeo] = useState(null);
-  const [tab, setTab] = useState(start.tab), [topology, setTopology] = useState(start.topology);
-  const [selected, setSelected] = useState(start.selected), [node, setNode] = useState(null), [hover, setHover] = useState(null);
-  const [cut, setCut] = useState(null), [path, setPath] = useState(null), [scope, setScope] = useState('cable');
-  const [layers, setLayers] = useState({mountain: true, lake: true, river: true, forest: false, access: true, bridges: true, added: true, soums: true, flow: true});
-  const [basemap, setBasemap] = useState(() => { try { return localStorage.getItem('fiber-basemap') || 'relief'; } catch { return 'relief'; } });
-  const [source, setSource] = useState('Darkhan'), [target, setTarget] = useState('Khentii'), [audit, setAudit] = useState(null);
-  const [busy, setBusy] = useState(''), [error, setError] = useState(''), [modal, setModal] = useState(null), [factor, setFactor] = useState(1);
-  const [picking, setPicking] = useState(null); // form values carried while the user clicks the map
-  const [tour, setTour] = useState(null), [tourRunning, setTourRunning] = useState(false);
-  const [toasts, setToasts] = useState([]), [tileNotice, setTileNotice] = useState(''), [theme, setTheme] = useState(initialTheme);
-  const [loadError, setLoadError] = useState('');
-  const alive = useRef(true);
+  const atlas = useAtlas();
+  const {
+    data, geography, geometry, loadError, busy, error, toasts, revision,
+    scene, setScene, topology, setTopology, selected, setSelected, node, setNode,
+    hover, setHover, replay, setReplay, corridor, evolution,
+    layers, setLayers, basemap, setBasemap, theme, setTheme,
+    source, setSource, target, setTarget, notify, reload, load, perform, mutate, runReplay,
+    name, edge, stats, edges,
+  } = atlas;
 
-  const notify = useCallback((text, kind = 'ok') => {
-    const id = Date.now() + Math.random();
-    setToasts(t => [...t, {id, text, kind}]);
-    setTimeout(() => alive.current && setToasts(t => t.filter(x => x.id !== id)), 4000);
-  }, []);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
+  const [focus, setFocus] = useState(null);
+  const [stage, setStage] = useState('mst');
+  const [scope, setScope] = useState('cable');
+  const [factor, setFactor] = useState(1);
+  const [modal, setModal] = useState(null);
+  const [picking, setPicking] = useState(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [highlight, setHighlight] = useState([]);
+  const isNarrow = useMediaQuery('(max-width: 760px)');
 
-  const reload = useCallback(async () => {
-    const value = await api('/api/network/topologies');
-    if (!alive.current) return value;
-    setData(value); setAudit(null);
-    setSource(old => value.cities.some(c => c.id === old) ? old : value.cities[0].id);
-    setTarget(old => value.cities.some(c => c.id === old) ? old : value.cities.at(-1).id);
-    return value;
-  }, []);
-  const load = useCallback(() => { setLoadError(''); Promise.all([reload(), api('/api/geography').then(setGeo)]).catch(e => setLoadError(e.message)); }, [reload]);
+  // The inspector is a column on the desktop and a sheet on a phone, so it
+  // follows the viewport rather than the width the page loaded at.
+  useEffect(() => { setInspectorOpen(!isNarrow); }, [isNarrow]);
 
-  useEffect(() => { alive.current = true; load(); return () => { alive.current = false; }; }, [load]);
-  useEffect(() => { try { localStorage.setItem('fiber-basemap', basemap); } catch {} }, [basemap]);
-  useEffect(() => { document.documentElement.dataset.theme = theme; try { localStorage.setItem('fiber-theme', theme); } catch {} }, [theme]);
-  useEffect(() => { history.replaceState(null, '', `#tab=${tab}&topo=${topology}&edge=${encodeURIComponent(selected)}`); }, [tab, topology, selected]);
-  useEffect(() => { setCut(null); setPath(null); if (data && !data.topologies[topology].edge_ids.includes(selected)) setSelected(data.topologies[topology].edge_ids[0]); }, [topology, data]);
-  useEffect(() => { setFactor(data?.cost_factors[selected] || 1); }, [selected, data]);
   useEffect(() => {
-    const onKey = e => {
-      if (e.key === 'Escape' && modal) { setModal(null); setError(''); return; }
-      if (modal || e.target.closest('input,select,textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
-      const i = ['1', '2', '3'].indexOf(e.key);
-      if (i >= 0) setTopology(TOPOLOGIES[i].key);
-      if (e.key === 'Escape') { setCut(null); setPath(null); setNode(null); setPicking(null); }
+    const media = matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => { setFactor(data?.cost_factors?.[selected] || 1); }, [selected, data]);
+
+  useEffect(() => {
+    const onKey = event => {
+      if (event.key === 'Escape' && !modal) {
+        setReplay(null); setNode(''); setFocus(null);
+        return;
+      }
+      if (modal || event.target.closest?.('input,select,textarea') || event.metaKey || event.ctrlKey || event.altKey) return;
+      const index = ['1', '2', '3'].indexOf(event.key);
+      if (index >= 0) setTopology(TOPOLOGIES[index].key);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [modal]);
+  }, [modal, setTopology]);
 
-  async function perform(task, fn) { setError(''); setBusy(task); try { return await fn(); } catch (e) { setError(e.message); notify(e.message, 'fail'); } finally { if (alive.current) setBusy(''); } }
-  async function mutation(url, body, method = 'POST', done = 'Хадгаллаа') {
-    const response = await api(url, body, method);
-    if (response.job_id) {
-      let status;
-      do { await new Promise(r => setTimeout(r, 700)); status = await api(`/api/jobs/${response.job_id}`); } while (status.status === 'running' && alive.current);
-      if (status.status === 'failed') throw new Error(status.message);
+  const selectEdge = useCallback((id, focusRoute = true) => {
+    setSelected(id);
+    if (focusRoute) setFocus({kind: 'edge', id, nonce: Date.now()});
+  }, [setSelected]);
+
+  const runFailure = useCallback(() => {
+    runReplay(topology, selected, scope);
+  }, [runReplay, topology, selected, scope]);
+
+  // Show the two cities that are furthest apart on the current topology, and
+  // draw the path the engine actually computes between them.
+  const showWorstPair = useCallback(async () => {
+    if (!stats?.worst_pair || stats.worst_pair.length !== 2) return;
+    const [from, to] = stats.worst_pair;
+    setSource(from); setTarget(to);
+    setScene('resilience');
+    setInspectorOpen(true);
+    try {
+      const value = await post('/api/network/path', {topology, source: from, target: to, failed_edges: replay?.failed_edges || []});
+      setHighlight(value.edges || []);
+    } catch {
+      setHighlight([]);
     }
-    await reload(); setCut(null); setPath(null); setModal(null); setNode(null); notify(done);
-  }
-  const runCut = (topo, edgeId, sc) => perform('Тасралтыг шалгаж байна', async () => { setPath(null); setCut(await api('/api/network/simulate-cut', {topology: topo, edge_id: edgeId, scope: sc})); });
-  const runPath = (topo, s, t, failed = []) => perform('Зам тооцож байна', async () => setPath(await api('/api/network/path', {topology: topo, source: s, target: t, failed_edges: failed})));
-  const runAudit = () => perform('Бүх кабелийг шалгаж байна', async () => setAudit(await api('/api/network/audit')));
+  }, [stats, topology, replay, setScene]);
 
-  const names = Object.fromEntries((data?.cities || []).map(c => [c.id, c.name]));
-  const name = id => names[id] || id;
-  const edge = data?.routes.find(r => r.id === selected), stats = data?.topologies[topology].stats;
-  const edgeIds = new Set(data?.topologies[topology].edge_ids || []);
-  const edges = data?.routes.filter(r => edgeIds.has(r.id)) || [];
-  const edgeName = r => r ? `${name(r.u)} — ${name(r.v)}` : 'Кабель сонгоно уу';
-  const chosen = edgeIds.has(selected);
-  function changeSelected(id) {
-    setSelected(id); setNode(null); setPath(null);
-    if (tab === 'manage' || tab === 'method') setTab('design');
-    if (data && !edgeIds.has(id)) { const t = TOPOLOGIES.find(t => data.topologies[t.key].edge_ids.includes(id)); if (t) setTopology(t.key); }
-  }
-  function selectNode(c) { setNode(c); if (tab === 'manage' || tab === 'method') setTab('design'); }
-  function showWorstPair() { const [a, b] = stats.worst_pair; setSource(a); setTarget(b); setNode(null); if (tab !== 'design' && tab !== 'failure') setTab('design'); runPath(topology, a, b, cut?.failed_edges || []); }
+  const onFactorSave = useCallback(() => {
+    perform('Өртөг шинэчилж байна', () => mutate(`/api/edges/${selected}`, {cost_factor: Number(factor)}, 'PATCH', 'Өртгийн үржвэр хадгалагдлаа'));
+  }, [perform, mutate, selected, factor]);
 
-  // Tour steps drive the real UI through this controller.
-  const tourContext = {setTab, setTopology, setScope, setSource, setTarget, clear: () => { setCut(null); setPath(null); setNode(null); }, cut: async (t, e, s) => { setSelected(e); await runCut(t, e, s); }, path: runPath, audit: runAudit};
-  async function goTour(step) { setTour(step); setTourRunning(true); try { await TOUR_STEPS[step].run(tourContext); } finally { setTourRunning(false); } }
+  const onExclude = useCallback(() => {
+    perform('Трасс хасаж байна', () => mutate(`/api/edges/${selected}`, {}, 'DELETE', 'Трассыг сангаас хаслаа'));
+  }, [perform, mutate, selected]);
 
-  const panelProps = {data, topology, edge, edges, selected, node, chosen, busy, name, edgeName, changeSelected, cut, path, source, target, setSource, setTarget, scope, setScope, audit, factor, setFactor, onHover: setHover,
-    onSelectNode: selectNode, onSelectEdge: changeSelected, onClose: () => setNode(null), onEdit: c => setModal({type: 'edit', ...c}),
-    onFindPath: () => runPath(topology, source, target, cut?.failed_edges || []),
-    onCut: () => runCut(topology, selected, scope), onClearCut: () => { setCut(null); setPath(null); }, onAudit: runAudit,
-    onFactorSave: () => perform('Өртөг шинэчилж байна', () => mutation(`/api/edges/${selected}`, {cost_factor: Number(factor)}, 'PATCH', 'Өртгийн үржвэр хадгалагдлаа')),
-    onExclude: () => perform('Трасс хасаж байна', () => mutation(`/api/edges/${selected}`, {}, 'DELETE', 'Трассыг сангаас хаслаа')),
-    onAddNode: () => setModal({type: 'new', lat: 47.5, lon: 107.5}), onEditNode: c => setModal({type: 'edit', ...c}), onReset: () => setModal({type: 'reset'}),
-    onToggleRoute: (id, restore) => perform(restore ? 'Трасс сэргээж байна' : 'Трасс хасаж байна', () => mutation(`/api/edges/${id}`, {}, restore ? 'POST' : 'DELETE', restore ? 'Трассыг сэргээлээ' : 'Трассыг сангаас хаслаа')),
+  const onToggleRoute = useCallback((id, restore) => {
+    perform(restore ? 'Трасс сэргээж байна' : 'Трасс хасаж байна', () => mutate(`/api/edges/${id}`, {}, restore ? 'POST' : 'DELETE', restore ? 'Трассыг сэргээлээ' : 'Трассыг сангаас хаслаа'));
+  }, [perform, mutate]);
+
+  const statusText = useMemo(() => {
+    if (busy) return busy;
+    if (replay) {
+      const parts = [`Тасралт идэвхтэй: ${replay.failed_edges.length} кабель`];
+      if (replay.isolated?.length) parts.push(`${replay.isolated.length} хот салсан`);
+      else parts.push('бүх хот холбоотой');
+      return parts.join(' · ');
+    }
+    return `${data?.cities.length ?? 0} хот · ${data?.routes.length ?? 0} боломжит трасс · ${stats?.edges ?? 0} сонгогдсон кабель`;
+  }, [busy, replay, data, stats]);
+
+  const inspectorProps = {
+    data, topology, edge, edges, selected, setSelected: selectEdge, node, setNode, stats,
+    chosen: !!edge, name, busy, factor, setFactor, onFactorSave, onExclude,
+    onFocus: setFocus, onEdit: city => setModal({type: 'edit', ...city}),
+    onAddNode: () => setModal({type: 'new'}),
+    onReset: () => setModal({type: 'reset'}),
+    onToggleRoute,
+    scope, setScope, onRun: runFailure, onClear: () => setReplay(null),
+    replay, corridor, evolution, stage, setStage,
+    source, setSource, target, setTarget, onHighlight: setHighlight,
+    onShowWorstPair: showWorstPair,
+    notify,
   };
 
+  // The evolution stage and a computed path both mark edges on the plate.
+  const stageIds = scene === 'evolution' && evolution
+    ? (evolution.stages.find(item => item.key === stage)?.edge_ids || [])
+    : [];
+  const markedIds = scene === 'evolution' ? stageIds : highlight;
+
   return <div className="app">
-    <Header tab={tab} setTab={setTab} busy={busy} topology={topology} theme={theme} setTheme={setTheme} tourOpen={tour != null} onTour={() => tour == null ? goTour(0) : setTour(null)}/>
-    {!data ? <div className="loading">{loadError ? <><div className="alert"><AlertTriangle size={15}/><span>Сервертэй холбогдсонгүй: {loadError}</span></div><p className="m-0 text-[13px] text-slate">Backend ажиллаж байгаа эсэхийг шалгаад дахин оролдоно уу.</p><button className="btn" onClick={load}><RotateCcw size={14}/>Дахин оролдох</button></> : <><LoaderCircle className="spin" size={22}/>Маршрутын загварыг бэлтгэж байна…</>}</div>
-    : tab === 'method' ? <Method data={data}/>
-    : <div className="workspace">
-      <TopologyRail data={data} topology={topology} setTopology={setTopology} name={name} edgeName={edgeName} onShowWorstPair={showWorstPair} onHover={setHover} changeSelected={changeSelected} selected={selected} busy={busy}/>
-      <div className="map-stage">
-        <GeoMap data={data} geography={geo} topology={topology} selected={selected} node={node} cut={cut} path={path} layers={layers} basemap={basemap} picking={!!picking} hover={hover} theme={theme}
-          onSelectEdge={changeSelected} onSelectNode={selectNode} onHover={setHover}
-          onPick={loc => { setModal({type: picking.type, ...picking, ...loc}); setPicking(null); }}
-          onTileFailure={() => { setBasemap('relief'); setTileNotice('Онлайн суурь зураг холбогдсонгүй. Офлайн рельефээр үргэлжилнэ.'); notify('Онлайн tile холбогдсонгүй, офлайн рельеф хэвээр', 'fail'); }}/>
-        <div className="map-float layer-bar" role="group" aria-label="Газрын зургийн давхаргууд"><label className="basemap-pick"><Map size={12}/><select aria-label="Суурь зураг" value={basemap} onChange={e => setBasemap(e.target.value)}>{BASEMAPS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}</select></label>{LAYER_TOGGLES.map(([k, label, Icon]) => (k !== 'added' || topology === 'protected') && <button key={k} aria-pressed={layers[k]} onClick={() => setLayers({...layers, [k]: !layers[k]})}><Icon size={12}/>{label}</button>)}</div>
-        {tour == null && <div className="map-float legend"><div>
-          <span><i style={{color: COLORS[topology]}}/>{TOPOLOGIES.find(t => t.key === topology).short} трасс</span>
-          {layers.bridges && stats.bridge_count > 0 && <span><i className="dashed" style={{color: COLORS[topology]}}/>Bridge</span>}
-          {layers.added && topology === 'protected' && <span><i className="cased" style={{color: COLORS[topology]}}/>Нэмэлт нөөц холбоос</span>}
-          <span><i style={{color: '#C27A12'}}/>Нөөц зам / богино зам</span>
-          <span><i className="dashed" style={{color: '#B3261E'}}/>Тасарсан</span>
-          <span><i className="dashed" style={{color: '#DC992E'}}/>Уулын нэвтрэх хэсэг</span>
-          <span><i className="dashed" style={{color: '#0A8786'}}/>Голын гарц</span>
-        </div></div>}
-        {picking && <div className="map-float picking-note"><div>Шинэ байршлыг газрын зураг дээр дарна уу.<button onClick={() => { setModal({type: picking.type, ...picking}); setPicking(null); }}>Болих</button></div></div>}
-        {tour != null && <Tour step={tour} running={tourRunning} onStep={goTour} onClose={() => setTour(null)}/>}
-        <div className="statusbar">
-          <span className="grow">{tileNotice || (cut ? `Тасралт идэвхтэй: ${cut.failed_edges.length} кабель · ${cut.isolated.length ? `${cut.isolated.length} хот салсан` : 'бүх хот холбоотой'}` : `${data.cities.length} хот · ${data.routes.length} боломжит трасс · ${stats.edges} сонгогдсон кабель`)}</span>
-          <span>Тооцоо {fmt(data.compute_ms)} мс</span>
-          <span className="keys"><span className="kbd">1</span><span className="kbd">2</span><span className="kbd">3</span> топологи <span className="kbd">Esc</span> цэвэрлэх</span>
-        </div>
+    <TopBar
+      topology={topology}
+      setTopology={setTopology}
+      theme={theme}
+      setTheme={setTheme}
+      revision={revision}
+      busy={busy}
+      onExport={() => window.open(`/api/export/geojson?topology=${topology}`, '_blank')}
+      onMethod={() => setScene('method')}
+    />
+
+    {!data
+      ? <div className="loading">
+        {loadError
+          ? <>
+            <div className="error-banner" role="alert"><AlertTriangle size={15}/><span>Сервертэй холбогдсонгүй: {loadError}</span></div>
+            <p className="prose">Backend ажиллаж байгаа эсэхийг шалгаад дахин оролдоно уу.</p>
+            <button className="btn" onClick={load}><RotateCcw size={14}/>Дахин оролдох</button>
+          </>
+          : <><LoaderCircle className="spin" size={22}/>Маршрутын загварыг бэлтгэж байна…</>}
       </div>
-      <aside className="panel" aria-label="Дэлгэрэнгүй">
-        {error && !modal && <div className="alert" role="alert"><AlertTriangle size={15}/><span>{error}</span><button onClick={() => setError('')} aria-label="Алдааны мэдэгдлийг хаах"><X size={14}/></button></div>}
-        {tab === 'failure' ? <FailureLab {...panelProps}/> : tab === 'manage' ? <DataPanel {...panelProps}/> : <CableInspector {...panelProps}/>}
-      </aside>
-    </div>}
-    {modal && <NodeModal modal={modal} busy={busy} error={error} onClose={() => { setModal(null); setError(''); }}
-      onSubmit={values => perform('Маршрутыг дахин тооцож байна', () => mutation(modal.type === 'new' ? '/api/nodes' : `/api/nodes/${modal.id}`, values, modal.type === 'new' ? 'POST' : 'PATCH', modal.type === 'new' ? `${values.name} нэмэгдлээ` : `${values.name} шинэчлэгдлээ`))}
-      onPickOnMap={values => { setPicking({...modal, ...values}); setModal(null); if (tab === 'method') setTab('design'); }}
-      onDelete={() => perform('Зангилаа хасаж байна', () => mutation(`/api/nodes/${modal.id}`, {}, 'DELETE', `${modal.name} хасагдлаа`))}
-      onReset={() => perform('Суурь төлөв сэргээж байна', () => mutation('/api/network/reset', {}, 'POST', 'Суурь 22 хотын төлөв сэргэлээ'))}/>}
+      : scene === 'method'
+        ? <MethodScene data={data}/>
+        : <div className="shell" data-inspector={inspectorOpen ? 'open' : 'closed'}>
+          <SceneRail scene={scene} setScene={setScene}/>
+          <div className="stage">
+            <MapPlate
+              data={data}
+              geography={geography}
+              geometry={geometry[topology]}
+              topology={topology}
+              selected={selected}
+              node={node}
+              replay={replay}
+              layers={layers}
+              basemap={basemap}
+              theme={theme}
+              picking={!!picking}
+              hover={hover}
+              corridor={corridor}
+              focus={focus}
+              highlightIds={markedIds}
+              onSelectEdge={id => selectEdge(id)}
+              onSelectNode={city => { setNode(city); setInspectorOpen(true); setFocus({kind: 'node', id: city.id, nonce: Date.now()}); }}
+              onHover={setHover}
+              onPick={location => { setModal({type: picking.type, ...picking, ...location}); setPicking(null); }}
+              onTileFailure={() => {
+                setBasemap('relief');
+                notify('Онлайн tile холбогдсонгүй. Офлайн рельефээр үргэлжилнэ.', 'fail');
+              }}
+            />
+            <SummaryStrip stats={stats} topology={topology} cities={data.cities.length}/>
+            <LayerControl layers={layers} setLayers={setLayers} basemap={basemap} setBasemap={setBasemap}/>
+            <Legend topology={topology} stats={stats} layers={layers} replay={replay} scene={scene}/>
+            <FailureTimeline replay={replay} reducedMotion={reducedMotion} onReset={() => setReplay(null)}/>
+          </div>
+          {inspectorOpen && <Inspector {...inspectorProps} scene={scene} onClose={() => setInspectorOpen(false)}/>}
+        </div>}
+
+    <div className="statusbar">
+      <span className="grow">{statusText}</span>
+      <span>Тооцоо {fmt(data?.compute_ms, 1)} мс</span>
+      <button className="btn btn-sm btn-ghost" onClick={() => setInspectorOpen(open => !open)} aria-label="Дэлгэрэнгүй хайврыг нээх эсвэл хаах">
+        {inspectorOpen ? <PanelRightClose size={13}/> : <PanelRightOpen size={13}/>}
+      </button>
+      <span className="keys"><span className="kbd">1</span><span className="kbd">2</span><span className="kbd">3</span> топологи <span className="kbd">Esc</span> цэвэрлэх</span>
+    </div>
+
+    {modal && <NodeModal
+      modal={modal}
+      busy={busy}
+      error={error}
+      onClose={() => { setModal(null); }}
+      onSubmit={values => perform('Маршрутыг дахин тооцож байна', () => mutate(
+        modal.type === 'new' ? '/api/nodes' : `/api/nodes/${modal.id}`,
+        values,
+        modal.type === 'new' ? 'POST' : 'PATCH',
+        modal.type === 'new' ? `${values.name} нэмэгдлээ` : `${values.name} шинэчлэгдлээ`))}
+      onPickOnMap={values => { setPicking({...modal, ...values}); setModal(null); }}
+      onDelete={() => perform('Зангилаа хасаж байна', () => mutate(`/api/nodes/${modal.id}`, {}, 'DELETE', `${modal.name} хасагдлаа`))}
+      onReset={() => perform('Суурь төлөв сэргээж байна', () => mutate('/api/network/reset', {}, 'POST', 'Суурь 22 хотын төлөв сэргэлээ'))}
+    />}
     <Toasts items={toasts}/>
   </div>;
 }

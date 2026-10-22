@@ -56,7 +56,7 @@ class Store:
 
     def save(self):
         self.audit_cache = None
-        self.corridor_cache = None
+        self.corridor_cache = {}
         self.revision += 1
         if self.persist:
             directory = ROOT / '.state'
@@ -72,13 +72,16 @@ class Store:
         if self.busy:
             raise ValueError('Маршрут шинэчилж байна. Дууссаны дараа дахин оролдоно уу.')
 
-    def corridor_analyzer(self):
+    def corridor_analyzer(self, buffer_km=5.0):
         """Built on demand: the projected geometry is only needed by the
         shared-risk scenes, and it must be rebuilt when the graph changes."""
         if self.corridor_cache is None:
+            self.corridor_cache = {}
+        key = round(float(buffer_km), 3)
+        if key not in self.corridor_cache:
             from .corridor import CorridorAnalyzer
-            self.corridor_cache = CorridorAnalyzer(list(self.model.routes.values()))
-        return self.corridor_cache
+            self.corridor_cache[key] = CorridorAnalyzer(list(self.model.routes.values()), buffer_km=key)
+        return self.corridor_cache[key]
 
     def rebuild(self, cities):
         self.require_idle()
@@ -194,23 +197,42 @@ def create_app(persist=True):
 
     @app.get('/api/network/corridors')
     def corridors():
-        from .corridor import CorridorAnalyzer
         topology = request.args.get('topology', 'protected')
         buffer_km = float(request.args.get('buffer_km', 5))
         if not 0.1 <= buffer_km <= 100:
-            raise ValueError('Зурвасын өргөн 0.1–100 км байна.')
+            raise ValueError('Коридорын өргөн 0.1–100 км байна.')
         with store.lock:
-            analyzer = store.corridor_analyzer()
-            edge_ids = store.model.graphs[topology].edges if store.model.graphs.get(topology) else []
-            ids = [d['id'] for _, _, d in store.model.graphs[topology].edges(data=True)] if store.model.graphs.get(topology) else []
+            model = store.model
+            graph = model.graphs.get(topology)
+            ids = [d['id'] for _, _, d in graph.edges(data=True)] if graph is not None else []
+            analyzer = store.corridor_analyzer(buffer_km)
             pairs = analyzer.overlaps(ids)
             groups = analyzer.groups(ids)
+            # The question the whole module exists for: does an added chord
+            # protect a tree edge it actually shares ground with?
+            coverage = []
+            if topology == 'protected' and model.two is not None:
+                from .evolution import coverage_map
+                tree_edges = ['--'.join(sorted(e)) for e in model.mst.edges]
+                chosen = [(u, v, d) for u, v, d in model.full.edges(data=True)
+                          if d['id'] in set(model.optimization.get('added') or [])]
+                mapping = coverage_map(model.mst, tree_edges, chosen)
+                pair_index = {(p['a'], p['b']): p for p in pairs}
+                for tree_edge, chords in mapping.items():
+                    for chord in chords:
+                        key = tuple(sorted((tree_edge, chord)))
+                        pair = pair_index.get(key) or pair_index.get((key[1], key[0]))
+                        coverage.append({
+                            'tree_edge': tree_edge, 'chord': chord,
+                            'parallel_km': pair['parallel_km'] if pair else 0.0,
+                            'overlap_km': pair['overlap_km'] if pair else 0.0,
+                        })
             return jsonify(topology=topology, buffer_km=buffer_km, pairs=pairs, groups=groups,
-                           policy=analyzer.policy, summary=analyzer.summary(ids), revision=store.revision)
+                           coverage=coverage, policy=analyzer.policy,
+                           summary=analyzer.summary(ids), revision=store.revision)
 
     @app.post('/api/network/impact')
     def impact():
-        from .corridor import CorridorAnalyzer
         data = body()
         topology = data.get('topology', 'protected')
         radius_km = float(data.get('radius_km', 25))
@@ -218,15 +240,21 @@ def create_app(persist=True):
         if not 1 <= radius_km <= 500:
             raise ValueError('Нөлөөллийн радиус 1–500 км байна.')
         with store.lock:
-            analyzer = store.corridor_analyzer()
-            ids = [d['id'] for _, _, d in store.model.graphs[topology].edges(data=True)] if store.model.graphs.get(topology) else []
+            model = store.model
+            graph = model.graphs.get(topology)
+            ids = [d['id'] for _, _, d in graph.edges(data=True)] if graph is not None else []
+            analyzer = store.corridor_analyzer(buffer_km)
             result = analyzer.impact(float(data.get('lat', 47.9)), float(data.get('lon', 106.9)),
                                      radius_km, ids, buffer_km)
             failed = result['direct'] + result['correlated']
             after = None
-            if failed:
-                after = scenario_module.analyse(store.model, topology, failed[0], 'cable')
-                after = None
+            if failed and graph is not None:
+                after = scenario_module.analyse(model, topology, failed[0], 'cable')
+                after['failed_edges'] = failed
+                after['scope_label'] = 'Нөлөөллийн хэсэг ба нийтлэг коридор'
+                after['scope_basis'] = 'footprint_plus_corridor'
+                after['scope_note'] = (f'{radius_km:.0f} км радиустай шорьсон хэсэг болон түүнтэй '
+                                       f'зэрэгцээ явж байгаа коридороос {len(failed)} кабель тасагдлаа.')
             return jsonify(**result, topology=topology, after=after, revision=store.revision)
 
     @app.post('/api/network/optimize')
