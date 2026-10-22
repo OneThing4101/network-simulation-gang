@@ -29,7 +29,8 @@
     "Backend: 63 pytest tests pass",
     "Frontend: 28 Vitest component/unit tests pass",
     "Frontend: ESLint 9 reports no problems",
-    "Browser: 20 Playwright tests pass (chromium-desktop + chromium-mobile)"
+    "Browser: 21 Playwright tests pass (chromium-desktop + chromium-mobile)",
+    "The shared-risk result is refetched when the topology changes: the tree shows 3 corridor groups, the protected design 2"
   ],
   "not_verified": [
     "Firefox and Edge runtime sessions: only Chromium is installed in this environment, so neither browser was exercised",
@@ -41,6 +42,7 @@
   ],
   "screenshots": [
     "studio-desktop.png",
+    "studio-evolution.png",
     "studio-failure-replay.png",
     "studio-light-corridor.png",
     "studio-mobile.png"

@@ -25,6 +25,13 @@ test.describe('the geographic common risk', () => {
     expect(worst.parallel_km).toBeLessThanOrEqual(worst.overlap_km + 1e-6);
   });
 
+  test('the shared-risk result follows the topology, not the one before it', async ({page}) => {
+    await page.goto('/#scene=resilience&topo=protected');
+    await expect(page.locator('.inspector')).toContainText('2 бүлэг');
+    await page.getByRole('radio', {name: /MST/}).click();
+    await expect(page.locator('.inspector')).toContainText('3 бүлэг');
+  });
+
   test('the budget frontier is solved, not drawn', async ({request}) => {
     const response = await request.post('/api/network/optimize', {data: {budgets_wkm: [1000, 4000]}});
     expect(response.status()).toBe(200);

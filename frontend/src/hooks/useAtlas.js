@@ -152,9 +152,17 @@ export function useAtlas() {
   }, [scene, evolution]);
 
   useEffect(() => {
-    if (scene !== 'resilience' || corridor) return;
-    get(`/api/network/corridors?topology=${topology}`).then(value => alive.current && setCorridor(value)).catch(() => {});
-  }, [scene, corridor, topology]);
+    if (scene !== 'resilience') return;
+    // The result belongs to one topology. A result for another topology must
+    // never be shown as the current one.
+    if (corridor && corridor.topology === topology) return;
+    let cancelled = false;
+    setCorridor(null);
+    get(`/api/network/corridors?topology=${topology}`)
+      .then(value => { if (!cancelled && alive.current) setCorridor(value); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [scene, topology]);
 
   const perform = useCallback(async (label, task) => {
     setError('');
