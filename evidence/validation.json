@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-19T19:48:01+08:00",
+  "timestamp": "2026-10-22T17:30:08+08:00",
   "python": "3.12.14",
   "networkx": "3.7",
   "cities": 22,
@@ -1733,9 +1733,9 @@
       "status": "proposed_not_surveyed"
     }
   ],
-  "grid_preprocessing_ms": 3963.0006970000977,
+  "grid_preprocessing_ms": 4310.438937995059,
   "route_dijkstra_ms": 149.91009500045038,
-  "topology_compute_ms": 19.976256000518333,
+  "topology_compute_ms": 21.53755499602994,
   "optimization": {
     "status": "optimal",
     "gap": 0.0,
@@ -1785,6 +1785,7 @@
           "Zuunmod"
         ]
       ],
+      "component_count": 1,
       "bridge_count": 21,
       "bridges": [
         "Altai--Bayankhongor",
@@ -1852,6 +1853,7 @@
           "Zuunmod"
         ]
       ],
+      "component_count": 1,
       "bridge_count": 0,
       "bridges": [],
       "fault_tolerant": true,
@@ -1897,6 +1899,7 @@
           "Zuunmod"
         ]
       ],
+      "component_count": 1,
       "bridge_count": 0,
       "bridges": [],
       "fault_tolerant": true,

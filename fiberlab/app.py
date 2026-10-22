@@ -72,6 +72,14 @@ class Store:
         if self.busy:
             raise ValueError('Маршрут шинэчилж байна. Дууссаны дараа дахин оролдоно уу.')
 
+    def prune_jobs(self, keep=20):
+        """Finished jobs are kept briefly so a late poll can still read them."""
+        if len(self.jobs) <= keep:
+            return
+        finished = [(key, job) for key, job in self.jobs.items() if job.get('status') != 'running']
+        for key, _ in finished[:len(self.jobs) - keep]:
+            self.jobs.pop(key, None)
+
     def corridor_analyzer(self, buffer_km=5.0):
         """Built on demand: the projected geometry is only needed by the
         shared-risk scenes, and it must be rebuilt when the graph changes."""
@@ -87,6 +95,7 @@ class Store:
         self.require_idle()
         self.busy = True
         job_id = str(uuid.uuid4())
+        self.prune_jobs()
         self.jobs[job_id] = {'status': 'running', 'message': 'Саадыг тооцож маршрутуудыг шинэчилж байна.'}
 
         def worker():
@@ -174,7 +183,8 @@ def create_app(persist=True):
 
     @app.get('/api/health')
     def health():
-        return jsonify(status='ok', application='fiber-atlas', root=str(ROOT), busy=store.busy, revision=store.revision)
+        # The absolute install path is not part of the public surface.
+        return jsonify(status='ok', application='fiber-atlas', busy=store.busy, revision=store.revision)
 
     @app.get('/api/network/topologies')
     def topologies():
