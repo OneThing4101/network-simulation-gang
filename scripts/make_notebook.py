@@ -20,7 +20,7 @@ md('''
 
 Веб нээх команд (Terminal):
 ```bash
-bash '/home/sembee/University-coursework/3A_semester/Сүлжээний загварчлал, симуляци/BiyDaalt/run-fiber-atlas.sh'
+bash run-fiber-atlas.sh    # репозиторийн язгуур директороос
 ```
 ''')
 md('''
@@ -158,18 +158,92 @@ for kind,graph in model.graphs.items():
 display(pd.DataFrame(survey))
 ''')
 md('''
-## 7. Логик нөөц ба газар дээрх хам эрсдэл
+## 7. Логик нөөц ба газар дээрх нийтлэг хам эрсдэл
 
-Нэг трассын дундах цэгт газар дээр давхацсан бүх кабелийг хамт таслах туршилт. Нэг логик кабелийн тасралтаас өөр нөхцөл тул 2-edge сүлжээ заавал даах албагүй. Инженерийн physically disjoint хамгаалалт хийхэд тусдаа сувгийн трасс, өөр голын гарц, нэмэлт зардал шаардлагатай.
+Дараахх нь суурийн «дунд цэгийн сэжиглэл» туршилт биш. Одоо **проекцласан метр зангилаанд** зурвас бүрийн дагуу тогтмол өргөнтэй коридор үүсгэж, хоёр кабель *зэрэгцээ* явж байгаа уртыг хэмжинэ. Чиглэл шалгалт тул нэг цэгийн огтлолцлыг нийтлэг зурвас гэж тооцохгүй: огтлолцол дээр хоёр кабель өөр өөр чигтэй явдаг тул зэрэгцээх урт нь тэг байна.
+
+Логик 2-edge баталгаа нь **хоёр дахь логик зам оршино** гэсэн баталгаа. Гэтэл хоёр кабель нэг уулын хөрөн дээр, нэг голын гарц дээр, нэг суваг дагуу дараалсан бол нэг шахалын ажил хоёуланг нь унагаж болно. Энэ нь модель; бодит хувьчлалын эрх тэмдэглэгээ эсвэл гамшгийн таамаглал биш.
 ''')
 code('''
-shared=[model.cut('protected',d['id'],'corridor') for _,_,d in model.two.edges(data=True)]
-print('Хам эрсдэлийн туршилт:',len(shared))
-print('Сүлжээ салсан тохиолдол:',sum(not r['connected'] for r in shared))
-print('Хамт тасарсан хамгийн олон кабель:',max(len(r['failed_edges']) for r in shared))
+from fiberlab.corridor import CorridorAnalyzer, CORRIDOR_POLICY
+
+analyzer=CorridorAnalyzer(list(model.routes.values()))
+protected_ids=[d['id'] for _,_,d in model.two.edges(data=True)]
+groups=analyzer.groups(protected_ids)
+pairs=analyzer.overlaps(protected_ids)
+
+display(pd.DataFrame([
+    {'Бүлэг':g['id'],'Кабелийн тоо':len(g['edge_ids']),'Зэрэгцээх нийт урт (км)':round(g['overlap_km'],1),
+     'Гишүүд':', '.join(names[e.split('--')[0]]+'–'+names[e.split('--')[1]] for e in g['edge_ids'][:6])+('…' if len(g['edge_ids'])>6 else '')}
+    for g in groups
+]))
+print('Коридорын өргөн:',CORRIDOR_POLICY['buffer_km'],'км; чиглэлийн зөвшөөрөл:',CORRIDOR_POLICY['parallel_angle_deg'],'°')
+''')
+code('''
+# Нэмэлт холбоос бүр хамгаалж байгаа модны холбоосоо хэр зэрэгцээ явж байгааг хэмжих
+from fiberlab.evolution import coverage_map
+
+tree_edges=['--'.join(sorted(e)) for e in model.mst.edges]
+chosen=[(u,v,d) for u,v,d in model.full.edges(data=True) if d['id'] in set(model.optimization['added'])]
+coverage=coverage_map(model.mst,tree_edges,chosen)
+index={(p['a'],p['b']):p for p in pairs}
+rows=[]
+for tree_edge,chords in coverage.items():
+    for chord in chords:
+        pair=index.get(tuple(sorted((tree_edge,chord))))
+        rows.append({'Модны холбоос':tree_edge,'Нэмэлт холбоос':chord,
+                     'Зэрэгцээх урт (км)':round(pair['parallel_km'],1) if pair else 0.0,
+                     'Коридорт орох урт (км)':round(pair['overlap_km'],1) if pair else 0.0,
+                     'Хамгаалалт':'физик (зэрэгцээ)' if pair and pair['parallel_km']>=1 else 'логик (зөвхөн зангилаан)'})
+table=pd.DataFrame(rows).sort_values('Зэрэгцээх урт (км)',ascending=False)
+display(table.head(10))
+shared_count=int((table['Зэрэгцээх урт (км)']>=1).sum())
+print(f'{shared_count}/{len(table)} нэмэлт холбоос хамгаалж байгаа модны холбоосоо 1 км-ээс дээш зэрэгцээ явж байна.')
+print('Үлдсэн',len(table)-shared_count,'нэмэлт холбоос хамгаалж байгаа холбоосоо зөвхөн зангилаанаар шүргэлцэнэ.')
+print('Хамгийн их:',table.iloc[0]['Зэрэгцээх урт (км)'],'км →',table.iloc[0]['Нэмэлт холбоос'])
+assert shared_count>0
 ''')
 md('''
-## 8. Хоёр хотын хамгийн богино зам ба дүгнэлт
+## 8. Төсөвийн фронт: хэдэн төсөвөөр хэдэн bridge хамгаалагдах вэ
+
+Дараах бүх цэг **HiGHS-ээр бодогдсон**: төсөвийн хязгаар ≤ B байх нөхцөлд хамгийн олон модны холбоосыг хамгаалах нэмэлт холбоосын багцыг олно. Тэгвэл бодлогын хүрээ, байдал, gap бүгд бодит solver-ийн гарал.
+''')
+code('''
+from fiberlab.optimize import budget_frontier
+
+frontier=budget_frontier(model.full,model.mst,[500,1000,2000,3000,4000,6000,8000,12000])
+display(pd.DataFrame([
+    {'Төсөв (w-км)':row['budget_wkm'],'Хамгаалагдсан bridge':row['covered'],
+     'Бодит нэмэлт өртөг (w-км)':round(row['added_cost_km'],1),
+     'Бодлогын байдал':row['status'],'Gap':row.get('gap'),'Хүрээ':row.get('scope')}
+    for row in frontier
+]))
+full_cover=[r for r in frontier if r['covered']==len(model.mst.edges)]
+assert full_cover, 'the full cover must be reachable within the tested budgets'
+print('Бүх bridge хамгаалах хамгийн бага төсөв:',round(min(r['added_cost_km'] for r in full_cover),1),'w-км')
+''')
+md('''
+## 9. Тасралтын хугацааны шугам: тооцоолсон төлөвүүд
+
+Веб дээрх хугацааны шугам **өөрөө үүсгэдэг сцени биш**. Дараах хүрээнүүд нь серверт бодитоор тооцогдсон төлөвүүд: эхний төлөв, гэмтэл илэрсэн, нөөц зам, шинэ төлөв. Дүрслэл зөвхөн эдгээр төлөвийн хооронд шилжинэ.
+''')
+code('''
+from fiberlab.scenario import replay
+
+edge_id='UB--Zuunmod'
+for kind in ['mst','protected']:
+    if edge_id not in [d['id'] for _,_,d in model.graphs[kind].edges(data=True)]:
+        edge_id=next(d['id'] for _,_,d in model.graphs[kind].edges(data=True));break
+frames=replay(model,'protected',edge_id)['frames']
+for frame in frames:
+    print('')
+    print(f"[{frame['key']}] {frame['title']}: {frame['caption']}")
+    if frame['reroute']:
+        print('   нөөц зам:',' → '.join(names[n] for n in frame['reroute']))
+''')
+
+md('''
+## 10. Хоёр хотын хамгийн богино зам ба дүгнэлт
 
 Доорх эхлэх/хүрэх хотыг өөрчлөөд дахин ажиллуулж болно. Жин нь км-ээрх `distance_km`; нийлмэл өртөг эсвэл зураг дээрх шугамын урттай андуурахгүй.
 ''')
@@ -192,7 +266,9 @@ md('''
 - MST дээрх нэмэлт холбоосын оптимум; бүх 2-edge сүлжээний глобал оптимум биш.
 - Natural Earth нь ерөнхий бүсийн зураг; DEM налуу, хад, жижиг горхи, газар эзэмшил, бодит авто/төмөр замын трасс ороогүй.
 - Уул доторх хотын нэвтрэх хэсэг ба голын төлөвлөсөн гарц тусдаа тайлагнагдсан.
-- Дэлгэрэнгүй техникийн тайлан: `docs/REPORT.md`; шаардлагын нотолгоо: `docs/REQUIREMENTS.md`; тест: `evidence/pytest.txt`.
+- Геометр дээрх нийтлэг зурвас нь **модель**: баталгаат хувьчлал эсвэл гамшгийн таамаглал биш.
+- Төсөвийн фронт нь **тогтсон нэг MST-ийг** хамгаалах хүрээнд; бүх 2-edge сүлжээний глобал оптимум биш.
+- Дэлгэрэнгүй техникийн тайлан: `docs/REPORT.md`; шаардлагын нотолгоо: `docs/REQUIREMENTS.md`; дизайн: `docs/DESIGN_SYSTEM.md`; архитектур: `docs/ARCHITECTURE.md`; аудит: `docs/RECONSTRUCTION_AUDIT.md`; тест: `evidence/pytest.txt`.
 
 Эх сурвалж: [Natural Earth](https://www.naturalearthdata.com/), [SciPy MILP](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.milp.html), [NetworkX](https://networkx.org/documentation/stable/), багшийн өгсөн заавар ба эх notebook.
 ''')

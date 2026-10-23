@@ -1,8 +1,7 @@
-.......................                                                  [100%]
+................................................................         [100%]
 ============================= slowest 5 durations ==============================
-4.32s setup    University-coursework/3A_semester/Сүлжээний загварчлал, симуляци/BiyDaalt/tests/test_network.py::test_all_routes_continuous_obstacle_and_endpoint_checks
-4.06s call     University-coursework/3A_semester/Сүлжээний загварчлал, симуляци/BiyDaalt/tests/test_network.py::test_grid_has_no_corner_cutting
-0.86s call     University-coursework/3A_semester/Сүлжээний загварчлал, симуляци/BiyDaalt/tests/test_network.py::test_all_routes_continuous_obstacle_and_endpoint_checks
-0.65s call     University-coursework/3A_semester/Сүлжээний загварчлал, симуляци/BiyDaalt/tests/test_network.py::test_node_crud_and_atomic_failure
-0.57s call     University-coursework/3A_semester/Сүлжээний загварчлал, симуляци/BiyDaalt/tests/test_network.py::test_every_single_failure_and_reroute
-23 passed in 12.06s
+14.82s call     tests/test_corridor.py::test_real_network_loads_and_carries_shared_risk
+7.83s setup    tests/test_network.py::test_all_routes_continuous_obstacle_and_endpoint_checks
+6.91s call     tests/test_network.py::test_grid_has_no_corner_cutting
+1.61s call     tests/test_network.py::test_all_routes_continuous_obstacle_and_endpoint_checks
+1.42s call     tests/test_corridor.py::test_real_overlaps_are_positive_distinct_and_sorted

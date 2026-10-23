@@ -80,12 +80,22 @@ def statistics(graph, baseline_km=1):
             'km': length, 'cost_km': sum(d['cost_km'] for _, _, d in graph.edges(data=True)),
             'overhead_pct': (length / baseline_km - 1) * 100 if baseline_km else 0,
             'connected': connected, 'components': components,
+            'component_count': len(components),
             'bridge_count': len(bridges), 'bridges': ['--'.join(e) for e in bridges],
             'fault_tolerant': connected and len(graph) >= 3 and not bridges,
             'rtt_ms': rtt if connected else None,
             'max_component_rtt_ms': rtt,
             'latency_pass': connected and rtt < 50,
             'worst_pair': list(worst[1:]), 'diameter_km': worst[0] if connected else None}
+
+
+def route_metadata(route):
+    """Route facts that are small enough to ship with every topology payload.
+
+    The full vertex list stays server-side: it is 1.4 MB for the 231
+    candidate routes and the map only ever needs one topology at a time.
+    """
+    return {key: value for key, value in route.items() if key not in ('geometry', 'trunk')}
 
 
 class NetworkModel:
@@ -119,38 +129,9 @@ class NetworkModel:
             raise ValueError('Энэ хувилбарт 2-edge-connected сүлжээ байгуулах боломжгүй.')
         return graph
 
-    def cut(self, topology, edge_id, scope='cable'):
-        if not isinstance(edge_id, str) or not isinstance(scope, str):
-            raise ValueError('Кабелийн ID болон тасралтын төрөл текст байна.')
-        graph = self.topology(topology)
-        selected = next((d for _, _, d in graph.edges(data=True) if d['id'] == edge_id), None)
-        if selected is None:
-            raise ValueError('Сонгосон кабель энэ топологид байхгүй.')
-        failed = [edge_id]
-        if scope == 'corridor':
-            from shapely.geometry import LineString, Point
-            line = LineString(selected['trunk'])
-            point = line.interpolate(0.5, normalized=True)
-            # Shared route segment at the midpoint; not a physical disaster prediction.
-            failed = [d['id'] for _, _, d in graph.edges(data=True)
-                      if LineString(d['geometry']).distance(point) < 0.00001]
-        elif scope != 'cable':
-            raise ValueError('Тасралтын төрөл буруу байна.')
-        H = graph.copy()
-        H.remove_edges_from((u, v) for u, v, d in graph.edges(data=True) if d['id'] in failed)
-        components = list(nx.connected_components(H))
-        root = 'UB' if 'UB' in H else next(iter(H))
-        root_component = next(c for c in components if root in c)
-        isolated = sorted(set(H) - root_component)
-        u, v = selected['u'], selected['v']
-        path = nx.shortest_path(H, u, v, weight='distance_km') if nx.has_path(H, u, v) else []
-        distance = nx.path_weight(H, path, 'distance_km') if path else None
-        return {'connected': nx.is_connected(H), 'isolated': isolated,
-                'reference_node': root, 'components': [sorted(c) for c in components],
-                'failed_edges': failed, 'scope': scope, 'reroute': path,
-                'reroute_edges': ['--'.join(sorted(e)) for e in zip(path, path[1:])],
-                'reroute_km': distance, 'reroute_rtt_ms': distance * .01 if distance is not None else None,
-                'after': statistics(H)}
+    def cut(self, topology, edge_id, scope='cable', corridor=None):
+        from .scenario import analyse
+        return analyse(self, topology, edge_id, scope, corridor)
 
     def path(self, topology, source, target, failed=None):
         graph = self.topology(topology).copy()
@@ -165,10 +146,17 @@ class NetworkModel:
         return {'connected': True, 'path': path, 'km': km, 'rtt_ms': km * .01,
                 'edges': ['--'.join(sorted(e)) for e in zip(path, path[1:])]}
 
+    def geometry(self, topology):
+        """Vertex lists for one topology only, fetched when the map needs them."""
+        graph = self.graphs.get(topology)
+        if graph is None:
+            raise ValueError('Энэ хувилбарт 2-edge-connected сүлжээ байгуулах боломжгүй.')
+        return {d['id']: d['geometry'] for _, _, d in graph.edges(data=True)}
+
     def payload(self):
         return {'cities': [{'id': k, **v} for k, v in self.cities.items()],
                 'topologies': {k: {'stats': self.stats[k], 'edge_ids': [d['id'] for _, _, d in g.edges(data=True)]} if g is not None else {'stats': None, 'edge_ids': []} for k, g in self.graphs.items()},
-                'routes': list(self.routes.values()), 'excluded': sorted(self.excluded),
+                'routes': [route_metadata(r) for r in self.routes.values()], 'excluded': sorted(self.excluded),
                 'cost_factors': self.overrides, 'optimization': self.optimization,
                 'compute_ms': self.compute_ms,
                 'assumptions': ['Зай нь торон least-cost симуляцийн урт; авто замын хэмжилт биш.',

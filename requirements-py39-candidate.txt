@@ -1,0 +1,36 @@
+# CANDIDATE LANE — NOT VERIFIED IN THIS ENVIRONMENT.
+#
+# The assignment asks for Python 3.9+. The tested stack in requirements.txt
+# cannot run on 3.9, because the pinned releases declare these floors:
+#
+#     networkx 3.7      Requires-Python >=3.12
+#     scipy   1.18.1    Requires-Python >=3.12
+#     numpy   2.5.3     Requires-Python >=3.12
+#
+# The lanes below are the oldest releases that still provide everything the
+# code uses. Nothing in fiberlab/ needs newer than these APIs:
+#
+#     scipy.optimize.milp        1.9+   (HiGHS mixed-integer solver)
+#     shapely STRtree/get_coordinates/line_interpolate_point  2.0+
+#     numpy                      1.22+
+#     networkx.minimum_spanning_tree / bridges  3.0+
+#
+# To adopt this lane, someone must:
+#   1. create a Python 3.9 environment,
+#   2. pip install -r requirements-py39-candidate.txt,
+#   3. run the full pytest suite plus the notebook, and
+#   4. confirm the recorded baseline numbers still reproduce
+#      (22 cities, 231 routes, MST 21 edges / 21 bridges / 5889.1 km,
+#       protected 27 edges / 0 bridges / 9087.7 km, +54.3% overhead).
+#
+# Until steps 1-4 are done, the supported and tested configuration is the one in
+# requirements.txt on Python 3.12+. This deviation is recorded in
+# docs/REQUIREMENTS.md and must be accepted by the instructor.
+
+Flask==3.0.3
+networkx==3.2.1
+numpy==1.26.4
+scipy==1.11.4
+shapely==2.0.4
+pyproj==3.6.1
+pytest==7.4.4

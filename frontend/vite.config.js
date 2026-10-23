@@ -9,4 +9,11 @@ export default defineConfig({
   // The Flask backend only accepts mutating requests from its own origin, so the dev proxy
   // must present itself as :5080 (Host and Origin) or every POST comes back 403.
   server: {proxy: {'/api': {target: BACKEND, changeOrigin: true, headers: {Origin: BACKEND}}}},
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    include: ['tests/**/*.test.{js,jsx}'],
+    setupFiles: ['tests/setup.js'],
+    restoreMocks: true,
+  },
 });

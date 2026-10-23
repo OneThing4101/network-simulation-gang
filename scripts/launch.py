@@ -25,7 +25,7 @@ def ready():
     try:
         with urllib.request.urlopen(url + '/api/health', timeout=2) as response:
             data = json.load(response)
-            return data.get('application') == 'fiber-atlas' and data.get('root') == str(ROOT)
+            return data.get('application') == 'network-simulation-gang' and data.get('status') == 'ok'
     except (OSError, ValueError):
         return False
 

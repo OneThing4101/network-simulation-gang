@@ -23,7 +23,11 @@ def model(cache):
 
 @pytest.fixture(scope='module')
 def router():
-    return TerrainRouter()
+    instance = TerrainRouter()
+    yield instance
+    # The routing grid is the largest native object in the suite. Releasing it
+    # here keeps the process from tearing it down during shutdown.
+    instance.release()
 
 
 @pytest.fixture(scope='module')

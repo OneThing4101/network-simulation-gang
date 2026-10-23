@@ -1,26 +1,57 @@
 {
-  "timestamp": "2026-10-19T19:58:22+08:00",
-  "browser": "Chromium via Chrome DevTools",
-  "passed": [
-    "MST/protected topology statistics",
-    "MST cut disconnects and isolated list shown",
-    "Protected cut reroute shown",
-    "Shortest path with active cut",
-    "Exhaustive audit 27/27 and 231/231",
-    "Manage tab: 22 nodes + 231 candidate routes",
-    "UI node add BrowserDemo -> 23 nodes; name and latitude edit; node delete -> 22",
-    "Methodology panel and source links",
-    "Desktop screenshot and mobile 390px screenshot",
-    "Mobile document width 390px; no horizontal overflow",
-    "Browser console: no errors or warnings after final build",
-    "Canonical OSM host failed in browser tunnel; automatic fallback to local vector map verified"
+  "timestamp": "2026-10-22T17:40:00+08:00",
+  "application": "Fiber Atlas 2.0 — National Network Resilience Studio",
+  "environment": {
+    "os": "Arch Linux (kernel 7.2.9)",
+    "python": "3.12.14",
+    "node": "26.11.1",
+    "browser": "Chromium 141 (Playwright 1.62.1)",
+    "viewport_desktop": "1440x900",
+    "viewport_mobile": "390x844 (devicePixelRatio 3, touch)"
+  },
+  "verified": [
+    "Studio opens on the 2-Edge topology with the computed strip: 27 cables, 0 bridges, 9,088 km, 28.3 ms, 11,239 w-km, 22 cities",
+    "All three topologies switch and the strip follows: MST 5,889 km / 21 cables, Full mesh 214,427 km / 231 cables",
+    "Topology, scene and selected cable are written to the URL hash and a deep link opens on the scene it names",
+    "MST cut of UB--Zuunmod: 21 cities isolated, 3 timeline frames",
+    "2-Edge cut of the same cable: all 22 cities stay connected, 4 timeline frames including the reroute",
+    "The reroute is computed by the engine (773 km, 7.7 ms) and drawn on the plate",
+    "The shared-risk finding is displayed: 14 of 23 protecting chords run alongside the tree edge they protect, worst 247.6 km",
+    "The cost frontier is solved server-side: 500 w-km covers 3/21 bridges, 4,000 w-km covers 21/21 at 3,955.2 w-km",
+    "The topology evolution scene shows the five construction stages from computed data (231 / 21 / 21 / 210 / 27)",
+    "GeoJSON export of the protected topology contains 27 LineString features",
+    "Mobile: no horizontal overflow (scrollWidth - innerWidth = 0 at 390 px)",
+    "Mobile: the topology switch moves onto the plate and keeps its names",
+    "Mobile: the scene rail becomes a horizontal strip above the plate",
+    "Mobile: the inspector opens as a sheet without pushing the page",
+    "Mobile: the legend starts folded so it does not cover the plate",
+    "No console errors after the final build",
+    "Backend: 64 pytest tests pass",
+    "Frontend: 28 Vitest component/unit tests pass",
+    "Frontend: ESLint 9 reports no problems",
+    "Browser: 21 Playwright tests pass (chromium-desktop + chromium-mobile)",
+    "The shared-risk result is refetched when the topology changes: the tree shows 3 corridor groups, the protected design 2"
   ],
   "not_verified": [
-    "Separate Firefox/Edge runtime sessions",
-    "Online OSM tile rendering: browser ERR_TUNNEL_CONNECTION_FAILED; local offline map works"
+    "Firefox and Edge runtime sessions: only Chromium is installed in this environment, so neither browser was exercised",
+    "Online OSM / CARTO / OpenTopoMap tile rendering: the sandbox proxy refuses those hosts. The offline relief and plain vector base maps were verified instead",
+    "Python 3.9 dependency lane: no 3.9 interpreter and no older wheels are reachable offline; only the 3.12+ lane was tested",
+    "Real road or rail routes, licence clearance for OSM data, and a reproducible OSM routing pipeline: not implemented (optional in the assignment)",
+    "Real traffic demand, link capacity, equipment processing delay or measured ping: not modelled, and not claimed",
+    "A globally optimised 2-edge-connected network design: only fixed-MST augmentation is implemented and labelled as such"
   ],
   "screenshots": [
-    "dashboard-desktop.png",
-    "dashboard-mobile.png"
-  ]
+    "studio-desktop.png",
+    "studio-evolution.png",
+    "studio-failure-replay.png",
+    "studio-light-corridor.png",
+    "studio-mobile.png"
+  ],
+  "commands": {
+    "backend_tests": ".venv/bin/python -m pytest tests -q --durations=5",
+    "frontend_lint": "cd frontend && npm run lint",
+    "frontend_unit": "cd frontend && npm run test",
+    "frontend_build": "cd frontend && npm run build",
+    "browser_tests": "cd frontend && npx playwright test"
+  }
 }
