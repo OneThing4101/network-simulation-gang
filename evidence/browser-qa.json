@@ -26,7 +26,7 @@
     "Mobile: the inspector opens as a sheet without pushing the page",
     "Mobile: the legend starts folded so it does not cover the plate",
     "No console errors after the final build",
-    "Backend: 63 pytest tests pass",
+    "Backend: 64 pytest tests pass",
     "Frontend: 28 Vitest component/unit tests pass",
     "Frontend: ESLint 9 reports no problems",
     "Browser: 21 Playwright tests pass (chromium-desktop + chromium-mobile)",
