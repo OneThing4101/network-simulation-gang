@@ -16,8 +16,8 @@ export default function TopBar({topology, setTopology, theme, setTheme, revision
     <div className="brand">
       <BrandMark/>
       <span className="brand-text">
-        <b>FIBER ATLAS</b>
-        <small>Монголын сүлжээний тэсвэрийн студи</small>
+        <b>NETWORK SIMULATION GANG</b>
+        <small>Монголын шилэн кабелийн сүлжээ</small>
       </span>
     </div>
 

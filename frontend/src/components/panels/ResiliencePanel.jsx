@@ -68,7 +68,7 @@ export default function ResiliencePanel({
           {replay.after?.connected ? 'Холболт хадгалагдлаа' : 'Сүлжээ тусгаарлагдлаа'}
         </strong>
         <span>{replay.failed_edges.length} кабель тасарлаа: {replay.failed_edges.map(label).join('; ')}.</span>
-        {replay.isolated?.length > 0 && <span>Улаанбаатараас салсан хот: {replay.isolated.map(id => name(id)).join(', ')}.</span>}
+        {replay.isolated?.length > 0 && <span>Улаанбаатараас салсан хотууд: {replay.isolated.map(id => name(id)).join(', ')}.</span>}
         {replay.after?.reroute?.length > 0 && <span>Нөөц чиглэл: {replay.after.reroute.map(name).join(' → ')} ({fmt(replay.after.reroute_km)} км, {fmt(replay.after.reroute_rtt_ms, 1)} мс).</span>}
       </div>
       <button className="btn btn-sm btn-ghost" onClick={onClear} style={{marginTop: 8}}><X size={12}/>Арилгах</button>

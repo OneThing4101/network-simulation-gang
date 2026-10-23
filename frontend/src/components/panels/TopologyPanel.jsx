@@ -72,7 +72,7 @@ export default function TopologyPanel({data, topology, edge, edges, selected, no
         <button className="btn btn-ghost btn-sm" style={{marginTop: 8, color: 'var(--color-fail)'}} disabled={!!busy} onClick={onExclude}>Трассыг боломжит сангаас хасах</button>
         <p className="prose" style={{marginTop: 6}}>Үржвэр өөрчлөгдөхөд MST ба нөөц холбоос дахин бодогдоно.</p>
       </div>
-    </> : <div className="empty">Карт дээр кабель дарж эсвэл дээрх жагсаалтаас сонгоно уу.</div>}
+    </> : <div className="empty">Карт дээрх кабелийг дарж эсвэл дээрх жагсаалтаас сонгоно уу.</div>}
 
     {stats && <>
       <div>

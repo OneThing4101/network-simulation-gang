@@ -1,4 +1,4 @@
-# Fiber Atlas — Монголын сүлжээний тэсвэрийн студи
+# Network Simulation Gang — Монголын шилэн кабелийн сүлжээний тэсвэрийн студи
 
 22 хотын газарзүйн трасс, Prim MST, Tarjan bridge, MILP нөөц холбоосын оновчлол,
 **тооцоолсон тасралтын хугацааны шугам**, геометр дээрх нийтлэг зурвасын шинжилгээ
@@ -223,3 +223,11 @@ curl -s http://127.0.0.1:5080/api/network/simulate-cut \
   сүлжээний глобал оптимум биш.
 
 Бүртгэл: `docs/RECONSTRUCTION_AUDIT.md` §4.
+
+## Дэлхийн суурь зураг
+
+Газрын зураг анхдагчаар офлайн дэлхийн зургийг (Natural Earth 1:50m,
+`frontend/public/world.geojson`) зөвхөн Монголын рельефтэй хамт дүрсэнээр харуулна.
+Дахин үүсгэх: `python scripts/make_world.py --countries ne_50m_admin_0_countries.shp --lakes ne_50m_lakes.shp`.
+Онлайн хэв маяг (OSM, CARTO, OpenTopoMap) давхарга самбараас сонгоно; холбогдохгүй бол
+офлайн дэлхийн зураг руу буцна.

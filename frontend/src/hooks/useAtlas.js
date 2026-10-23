@@ -54,7 +54,7 @@ export function useAtlas() {
   const [evolution, setEvolution] = useState(null);
   const [layers, setLayers] = useState(DEFAULT_LAYERS);
   const [basemap, setBasemap] = useState(() => {
-    try { return localStorage.getItem('fiber-basemap') || 'relief'; } catch { return 'relief'; }
+    try { return localStorage.getItem('fiber-basemap') || 'world'; } catch { return 'world'; }
   });
   const [theme, setTheme] = useState(readTheme);
   const [source, setSource] = useState('UB');
@@ -194,7 +194,7 @@ export function useAtlas() {
 
   const runReplay = useCallback(async (topo, edgeId, scope = 'cable') => {
     if (!edgeId) return;
-    await perform('Тасралтыг шалгаж байна', async () => {
+    await perform('Тасралтыг симуляцилж байна', async () => {
       const result = await post('/api/network/failure-replay', {topology: topo, edge_id: edgeId, scope});
       if (alive.current) { setReplay(result); setSelected(edgeId); }
       return result;

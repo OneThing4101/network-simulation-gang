@@ -25,7 +25,7 @@ def ready():
     try:
         with urllib.request.urlopen(url + '/api/health', timeout=2) as response:
             data = json.load(response)
-            return data.get('application') == 'fiber-atlas' and data.get('status') == 'ok'
+            return data.get('application') == 'network-simulation-gang' and data.get('status') == 'ok'
     except (OSError, ValueError):
         return False
 
@@ -41,7 +41,7 @@ if args.stop:
             if not ready():
                 break
             time.sleep(.1)
-        print('Fiber Atlas сервер зогслоо.')
+        print('Network Simulation Gang сервер зогслоо.')
     else:
         print('Сервер аль хэдийн зогссон байна.')
     sys.exit(0)
@@ -61,7 +61,7 @@ if not ready():
     else:
         sys.exit(f'Сервер бэлтгэгдэж байна. Лог: {runtime / "server.log"}')
 
-print(f'Fiber Atlas ажиллаж байна: {url}')
+print(f'Network Simulation Gang ажиллаж байна: {url}')
 if not args.no_browser:
     subprocess.Popen(['xdg-open', url], stdin=subprocess.DEVNULL,
                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)

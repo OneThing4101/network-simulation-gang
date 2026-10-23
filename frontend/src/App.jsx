@@ -218,7 +218,7 @@ export default function App() {
         modal.type === 'new' ? `${values.name} нэмэгдлээ` : `${values.name} шинэчлэгдлээ`))}
       onPickOnMap={values => { setPicking({...modal, ...values}); setModal(null); }}
       onDelete={() => perform('Зангилаа хасаж байна', () => mutate(`/api/nodes/${modal.id}`, {}, 'DELETE', `${modal.name} хасагдлаа`))}
-      onReset={() => perform('Суурь төлөв сэргээж байна', () => mutate('/api/network/reset', {}, 'POST', 'Суурь 22 хотын төлөв сэргээлээ'))}
+      onReset={() => perform('Анхны төлөвийг сэргээж байна', () => mutate('/api/network/reset', {}, 'POST', 'Анхны 22 хотын төлөв сэргээлээ'))}
     />}
     <Toasts items={toasts}/>
   </div>;

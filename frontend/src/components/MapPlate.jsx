@@ -5,8 +5,8 @@ import {COLORS, MONGOLIA_BOUNDS, HIGHLIGHT, FAIL} from '../constants';
 
 export const RELIEF_BOUNDS = [[41.0, 87.0], [52.5, 120.5]];
 export const BASEMAPS = [
+  {key: 'world', label: 'Дэлхий (офлайн)'},
   {key: 'relief', label: 'Рельеф (офлайн)'},
-  {key: 'plain', label: 'Энгийн (офлайн)'},
   {key: 'osm', label: 'OpenStreetMap', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'},
   {key: 'carto-light', label: 'CARTO цайвар', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'},
   {key: 'carto-dark', label: 'CARTO харанхуй', url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'},
@@ -15,8 +15,8 @@ export const BASEMAPS = [
 
 // Geography palette per theme. Cable colours never change: they are fixed by the assignment.
 const PALETTE = {
-  light: {country: {color: '#6B7C86', fill: .04}, aimag: {color: '#A3B2B9', fill: 0}, mountain: {color: '#6F8290', fill: .13}, lake: {color: '#5FAFD3', fill: .6}, river: {color: '#4A9FC9', fill: 0}, forest: {color: '#6E9466', fill: .13}, marker: '#2E3F4D', focus: '#16232E', markerFill: '#fff', casing: '#fff', soum: '#8A9AA3', graticule: '#9AA7AE'},
-  dark: {country: {color: '#8FA3B0', fill: .07}, aimag: {color: '#4A5B66', fill: 0}, mountain: {color: '#9FB0BC', fill: .12}, lake: {color: '#3E88AD', fill: .55}, river: {color: '#3E88AD', fill: 0}, forest: {color: '#5B7D55', fill: .18}, marker: '#D5DEE3', focus: '#F2F4F3', markerFill: '#1B2730', casing: '#111A21', soum: '#4F6270', graticule: '#3D4E58'},
+  light: {country: {color: '#6B7C86', fill: .04}, aimag: {color: '#A3B2B9', fill: 0}, mountain: {color: '#6F8290', fill: .13}, lake: {color: '#5FAFD3', fill: .6}, river: {color: '#4A9FC9', fill: 0}, forest: {color: '#6E9466', fill: .13}, marker: '#2E3F4D', focus: '#16232E', markerFill: '#fff', casing: '#fff', soum: '#8A9AA3', graticule: '#9AA7AE', land: {color: '#D9D3C9', fill: '#F4F2ED'}, worldLake: {color: '#BFDBF0', fill: '#BFDBF0'}},
+  dark: {country: {color: '#8FA3B0', fill: .07}, aimag: {color: '#4A5B66', fill: 0}, mountain: {color: '#9FB0BC', fill: .12}, lake: {color: '#3E88AD', fill: .55}, river: {color: '#3E88AD', fill: 0}, forest: {color: '#5B7D55', fill: .18}, marker: '#D5DEE3', focus: '#F2F4F3', markerFill: '#1B2730', casing: '#111A21', soum: '#4F6270', graticule: '#3D4E58', land: {color: '#2C3A45', fill: '#1B2630'}, worldLake: {color: '#12222E', fill: '#12222E'}},
 };
 const WEIGHT = {country: 1.4, aimag: .6, mountain: .7, lake: .7, river: 1.6, forest: .6};
 const LABEL_DIR = {Zuunmod: 'bottom', Bulgan: 'left', Erdenet: 'top', Darkhan: 'right', UB: 'top', Bayankhongor: 'left', Arvaikheer: 'right', Mandalgovi: 'bottom', Choir: 'right', Khentii: 'top', Tsetserleg: 'left', Uliastai: 'bottom'};
@@ -64,6 +64,7 @@ export default function MapPlate({
   const [cursor, setCursor] = useState(null);
   const [labelZoom, setLabelZoom] = useState(5);
   const soums = useRef({data: null, loading: false, lines: null, labels: null, aimags: null});
+  const world = useRef({data: null, loading: false, layer: null});
   const handlers = useRef({});
   handlers.current = {onPick, onTileFailure, onHover, picking};
 
@@ -78,6 +79,7 @@ export default function MapPlate({
     m.createPane('soums').style.zIndex = 350;
     m.createPane('soumLabels').style.zIndex = 360;
     m.createPane('graticule').style.zIndex = 320;
+    m.createPane('world').style.zIndex = 150;
     map.current = m;
 
     // The plate is refitted when its frame changes, until the reader takes
@@ -110,11 +112,27 @@ export default function MapPlate({
     return () => { m.off('zoomend', update); m.off('moveend', update); observer.disconnect(); };
   }, []);
 
+  // Basemap: the offline vector world, the offline relief plate, or an online
+  // tile style drawn over the world. A failing tile source leaves the offline
+  // world underneath, so the plate is never blank.
   useEffect(() => {
     const m = map.current; if (!m) return;
     tiles.current?.remove(); tiles.current = null;
     const b = BASEMAPS.find(x => x.key === basemap) || BASEMAPS[0];
-    if (b.key === 'relief') relief.current.addTo(m); else relief.current.remove();
+    relief.current.remove();
+    const st = world.current;
+    const wantsWorld = b.key === 'world' || !!b.url;
+    if (wantsWorld) {
+      if (!st.data && !st.loading) {
+        st.loading = true;
+        fetch('/world.geojson').then(r => r.json()).then(d => { st.data = d; st.loading = false; refreshWorld(); }).catch(() => { st.loading = false; });
+      } else if (st.data) {
+        refreshWorld();
+      }
+    }
+    if (st.layer && !wantsWorld) { st.layer.remove(); st.layer = null; }
+    // The relief plate sits over the world vector so Mongolia keeps its shape.
+    if (b.key === 'relief' || b.key === 'world') relief.current.addTo(m);
     if (b.url) {
       let failures = 0;
       tiles.current = L.tileLayer(b.url, {maxZoom: 18, subdomains: 'abcd', attribution: b.attribution});
@@ -154,6 +172,21 @@ export default function MapPlate({
     if (!wantAimags && st.aimags) { st.aimags.remove(); st.aimags = null; }
     if (st.lines) st.lines.setStyle({color: pal.soum});
   }, [layers.soums, theme]);
+
+  // The offline world: Natural Earth land and lakes, drawn as a quiet plate
+  // under the network so the country still reads in context.
+  const refreshWorld = useCallback(() => {
+    const m = map.current, st = world.current;
+    if (!m || !st.data) return;
+    const pal = PALETTE[theme] || PALETTE.light;
+    const style = feature => {
+      const lake = feature.properties?.k === 'lake';
+      const swatch = lake ? pal.worldLake : pal.land;
+      return {color: swatch.color, weight: .5, fillColor: swatch.fill, fillOpacity: 1, interactive: false};
+    };
+    if (!st.layer) st.layer = L.geoJSON(st.data, {pane: 'world', interactive: false, style}).addTo(m);
+    else st.layer.setStyle(style);
+  }, [theme]);
 
   useEffect(() => { refreshSoums(); }, [refreshSoums]);
   useEffect(() => {

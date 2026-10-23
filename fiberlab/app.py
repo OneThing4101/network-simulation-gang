@@ -267,7 +267,7 @@ def create_app(persist=True):
     @app.get('/api/health')
     def health():
         # The absolute install path is not part of the public surface.
-        return jsonify(status='ok', application='fiber-atlas', busy=store.busy, revision=store.revision)
+        return jsonify(status='ok', application='network-simulation-gang', busy=store.busy, revision=store.revision)
 
     @app.get('/api/network/topologies')
     def topologies():
