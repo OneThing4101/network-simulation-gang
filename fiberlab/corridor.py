@@ -251,6 +251,14 @@ class CorridorAnalyzer:
         self._groups_cache[key] = groups
         return groups
 
+    def release(self):
+        """Drop the cached geometry so a long-lived process can free it."""
+        self._tables = {}
+        self._groups_cache = {}
+        self._corridors = {}
+        self._samples = {}
+        self._trees = {}
+
     def corridor_of(self, edge_id: str, edge_ids=None) -> list[str]:
         if edge_id not in self._index:
             raise ValueError(f'Кабелийн ID олдсонгүй: {edge_id}')

@@ -21,7 +21,7 @@ export default function App() {
   const {
     data, geography, geometry, loadError, busy, error, toasts, revision,
     scene, setScene, topology, setTopology, selected, setSelected, node, setNode,
-    hover, setHover, replay, setReplay, corridor, evolution,
+    hover, setHover, replay, setReplay, corridor, corridorLoading, evolution,
     layers, setLayers, basemap, setBasemap, theme, setTheme,
     source, setSource, target, setTarget, notify, load, perform, mutate, runReplay,
     name, edge, stats, edges,
@@ -123,7 +123,7 @@ export default function App() {
     onReset: () => setModal({type: 'reset'}),
     onToggleRoute,
     scope, setScope, onRun: runFailure, onClear: () => setReplay(null),
-    replay, corridor, evolution, stage, setStage,
+    replay, corridor, corridorLoading, evolution, stage, setStage,
     source, setSource, target, setTarget, onHighlight: setHighlight,
     onShowWorstPair: showWorstPair,
     notify,

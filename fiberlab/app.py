@@ -110,11 +110,12 @@ class Store:
     def prewarm_corridors(self):
         """Compute the shared-risk analysis while the service is idle.
 
-        The full-mesh case is the slow one: every one of the 231 routes is
-        compared with every other. Doing it here means no reader ever waits
-        for it.
+        Only the two designs the studio actually reasons about are warmed:
+        the tree and the protected design. The full mesh compares all 231
+        routes with each other, which takes seconds, so it is computed on
+        demand and then cached.
         """
-        for topology in ('mst', 'protected', 'full'):
+        for topology in ('mst', 'protected'):
             try:
                 self.corridor_result(topology)
             except Exception:
@@ -199,7 +200,13 @@ def create_app(persist=True):
 
     # The shared-risk analysis is the heaviest calculation in the service.
     # It runs while the service is idle so the first reader does not wait.
-    threading.Thread(target=store.prewarm_corridors, daemon=True).start()
+    #
+    # The thread is deliberately NOT a daemon: a daemon thread that is still
+    # inside a native GEOS call when the interpreter shuts down races with the
+    # finalisation of the extension modules and crashes the process. A regular
+    # thread is joined by the interpreter before that teardown, so the work
+    # always finishes first.
+    threading.Thread(target=store.prewarm_corridors, name='corridor-prewarm').start()
 
     @app.after_request
     def compress(response):

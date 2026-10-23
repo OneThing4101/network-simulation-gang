@@ -26,7 +26,12 @@ def make_route(edge_id, coords):
 @pytest.fixture(scope='module')
 def analyzer():
     cache = json.loads((ROOT / 'data/routes.cache.json').read_text())
-    return CorridorAnalyzer(cache['routes'])
+    instance = CorridorAnalyzer(cache['routes'])
+    yield instance
+    # The cached pair tables and corridor bands hold a lot of native geometry.
+    # Releasing them here keeps the peak small when several modules run in
+    # one process.
+    instance.release()
 
 
 def test_projection_is_the_same_string_terrain_uses():

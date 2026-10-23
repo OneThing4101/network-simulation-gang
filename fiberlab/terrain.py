@@ -113,6 +113,27 @@ class TerrainRouter:
         self.last_dijkstra_ms = 0
         self.build_ms = (time.perf_counter() - self.started) * 1000
 
+    def release(self):
+        """Drop the large arrays so a long-lived process can free them early.
+
+        The routing grid, the trees and the buffered geography are the biggest
+        native objects the service holds. Releasing them explicitly keeps the
+        peak low and avoids tearing them down during interpreter shutdown.
+        """
+        self.grid = None
+        self.xy = None
+        self.lonlat = None
+        self.main_ids = None
+        self.main_tree = None
+        self.tree = None
+        self.mult = None
+        self.ids = None
+        self.gate_geometry = None
+        self.blocked = None
+        self.water = None
+        self.forest = None
+        self.gates = {}
+
     def endpoint(self, city):
         point = Point(self.forward.transform(city['lon'], city['lat']))
         if not self.country.covers(point):

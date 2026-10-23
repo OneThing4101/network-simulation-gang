@@ -50,6 +50,7 @@ export function useAtlas() {
   const [hover, setHover] = useState(null);
   const [replay, setReplay] = useState(null);
   const [corridor, setCorridor] = useState(null);
+  const [corridorLoading, setCorridorLoading] = useState(false);
   const [evolution, setEvolution] = useState(null);
   const [layers, setLayers] = useState(DEFAULT_LAYERS);
   const [basemap, setBasemap] = useState(() => {
@@ -158,9 +159,11 @@ export function useAtlas() {
     if (corridor && corridor.topology === topology) return;
     let cancelled = false;
     setCorridor(null);
+    setCorridorLoading(true);
     get(`/api/network/corridors?topology=${topology}`)
       .then(value => { if (!cancelled && alive.current) setCorridor(value); })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => { if (!cancelled && alive.current) setCorridorLoading(false); });
     return () => { cancelled = true; };
   }, [scene, topology]);
 
@@ -226,7 +229,7 @@ export function useAtlas() {
     data, geography, geometry, loadError, busy, error, toasts, revision,
     scene, setScene: changeScene, topology, setTopology,
     selected, setSelected: changeSelected, node, setNode, hover, setHover,
-    replay, setReplay, corridor, setCorridor, evolution, setEvolution,
+    replay, setReplay, corridor, setCorridor, corridorLoading, evolution, setEvolution,
     layers, setLayers, basemap, setBasemap, theme, setTheme,
     source, setSource, target, setTarget,
     notify, reload, load, perform, mutate, runReplay,

@@ -47,6 +47,25 @@ def test_the_python_39_candidate_lane_is_marked_as_unverified():
     assert '3.12+' in text, 'the deviation must point at the supported lane'
 
 
+def test_background_work_is_not_a_daemon_thread():
+    """A daemon thread inside a native call crashes the interpreter at exit.
+
+    The corridor pre-warm runs GEOS code in the background. If that thread is
+    a daemon, the interpreter can finalise the extension modules while the
+    thread is still inside them, and the process dies with a segmentation
+    fault after the tests have already passed. A regular thread is joined
+    before that teardown.
+    """
+    import threading
+    from fiberlab.app import create_app
+
+    create_app(persist=False)
+    workers = [t for t in threading.enumerate() if t.name == 'corridor-prewarm']
+    assert workers, 'the pre-warm thread was not started'
+    for worker in workers:
+        assert not worker.daemon, 'the pre-warm thread must not be a daemon'
+
+
 def test_the_source_parses_on_the_oldest_declared_syntax():
     """No syntax newer than the assignment floor may creep into the source."""
     import ast

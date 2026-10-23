@@ -1,7 +1,7 @@
-.............................................................            [100%]
+................................................................         [100%]
 ============================= slowest 5 durations ==============================
-7.69s call     tests/test_corridor.py::test_real_network_loads_and_carries_shared_risk
-3.75s call     tests/test_network.py::test_grid_has_no_corner_cutting
-3.75s setup    tests/test_network.py::test_all_routes_continuous_obstacle_and_endpoint_checks
-0.78s call     tests/test_network.py::test_all_routes_continuous_obstacle_and_endpoint_checks
-0.66s call     tests/test_corridor.py::test_real_overlaps_are_positive_distinct_and_sorted
+14.82s call     tests/test_corridor.py::test_real_network_loads_and_carries_shared_risk
+7.83s setup    tests/test_network.py::test_all_routes_continuous_obstacle_and_endpoint_checks
+6.91s call     tests/test_network.py::test_grid_has_no_corner_cutting
+1.61s call     tests/test_network.py::test_all_routes_continuous_obstacle_and_endpoint_checks
+1.42s call     tests/test_corridor.py::test_real_overlaps_are_positive_distinct_and_sorted

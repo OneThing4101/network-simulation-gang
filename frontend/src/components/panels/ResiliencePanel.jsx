@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {AlertTriangle, Check, MapPinned, ShieldCheck, X, Zap} from 'lucide-react';
+import {AlertTriangle, Check, LoaderCircle, MapPinned, ShieldCheck, X, Zap} from 'lucide-react';
 import {fmt} from '../../constants';
 import {get} from '../../api';
 import PathTool from './PathTool';
@@ -14,7 +14,7 @@ const SCOPES = [
 // logical redundancy cannot cover.
 export default function ResiliencePanel({
   data, topology, edges, selected, chosen, busy, scope, setScope,
-  replay, onRun, onClear, name, onSelectEdge, onFocus, corridor,
+  replay, onRun, onClear, name, onSelectEdge, onFocus, corridor, corridorLoading,
   source, setSource, target, setTarget, onHighlight,
 }) {
   const [audit, setAudit] = useState(null);
@@ -98,6 +98,14 @@ export default function ResiliencePanel({
           </button>)}
         </div>
       </> : <p className="prose">Өгөгдсөн зайлшгүйцээсээр олдсон давхцлын бүлэг байхгүй.</p>}
+    </div>}
+
+    {corridorLoading && <div>
+      <div className="eyebrow count"><span>Геометр дээрх нийтлэг зурвас</span></div>
+      <div className="empty" style={{display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center'}}>
+        <LoaderCircle className="spin" size={14}/>Зурвасны давхцлыг тооцож байна…
+      </div>
+      <p className="prose" style={{marginTop: 6}}>Бүх маршрутын хоорондын давхцлыг шалгах нь хамгийн удаан тооцоо. Full mesh топологид энэ нь хэдэн секунд үргэлжлэх бөгөөд дараагийн удаа хурдан болно.</p>
     </div>}
 
     {corridor?.coverage?.length > 0 && (() => {
